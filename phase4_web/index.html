@@ -5,11 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FEDXAI-AUTO Dashboard</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -32,16 +29,6 @@
             box-shadow: 0 0 8px currentColor;
         }
 
-        .text-neon-green {
-            color: #4ade80;
-            text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
-        }
-
-        .text-neon-red {
-            color: #f87171;
-            text-shadow: 0 0 5px rgba(248, 113, 113, 0.5);
-        }
-
         canvas {
             max-height: 150px;
         }
@@ -49,7 +36,6 @@
 </head>
 
 <body class="p-6">
-
     <!-- Header -->
     <div class="max-w-6xl mx-auto mb-8 flex justify-between items-center">
         <div>
@@ -71,10 +57,8 @@
     </div>
 
     <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        <!-- Live Metrics Panel -->
+        <!-- Metrics -->
         <div class="md:col-span-2 space-y-6">
-            <!-- Top stats -->
             <div class="grid grid-cols-3 gap-4">
                 <div class="glass p-4 rounded-xl text-center">
                     <div class="text-slate-400 text-xs uppercase tracking-wider mb-1">Engine RPM</div>
@@ -87,22 +71,19 @@
                     <div class="text-xs text-slate-500">Celsius</div>
                 </div>
                 <div class="glass p-4 rounded-xl text-center">
-                    <div class="text-slate-400 text-xs uppercase tracking-wider mb-1">Engine Load</div>
-                    <div class="text-3xl font-mono font-bold text-purple-400" id="val-load">0%</div>
-                    <div class="text-xs text-slate-500">Percentage</div>
+                    <div class="text-slate-400 text-xs uppercase tracking-wider mb-1">Fuel Pressure</div>
+                    <div class="text-3xl font-mono font-bold text-purple-400" id="val-fp">0.0</div>
+                    <div class="text-xs text-slate-500">Bar</div>
                 </div>
             </div>
-
-            <!-- Charts -->
             <div class="glass p-4 rounded-xl">
                 <h3 class="text-sm font-semibold text-slate-300 mb-4">Live Sensor Telemetry</h3>
                 <canvas id="mainChart"></canvas>
             </div>
         </div>
 
-        <!-- AI Diagnostics Panel -->
+        <!-- AI Panel -->
         <div class="space-y-6">
-            <!-- Health Status -->
             <div class="glass p-6 rounded-xl text-center relative overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent" id="health-bg"></div>
                 <h3 class="text-sm font-semibold text-slate-300 mb-2 relative z-10">Vehicle Health</h3>
@@ -113,7 +94,6 @@
                 </div>
             </div>
 
-            <!-- Failure Probability -->
             <div class="glass p-4 rounded-xl">
                 <div class="flex justify-between items-end mb-2">
                     <span class="text-xs text-slate-400 uppercase">Failure Probability</span>
@@ -124,7 +104,6 @@
                 </div>
             </div>
 
-            <!-- XAI Alert Box -->
             <div class="glass p-4 rounded-xl border-l-4 border-slate-600" id="alert-box">
                 <h3 class="text-sm font-semibold text-slate-300 mb-2">
                     <i class="fa-solid fa-robot mr-2 text-blue-400"></i> AI Diagnosis
@@ -132,21 +111,19 @@
                 <p class="text-sm text-slate-400" id="xai-msg">Waiting for data...</p>
             </div>
 
-            <!-- Console Log -->
             <div class="glass p-3 rounded-xl h-32 overflow-y-auto font-mono text-xs text-slate-500" id="console-log">
-                <div>> System initialized.</div>
-                <div>> Waiting for BLE connection...</div>
+                <div>> System ready. Click 'Connect'.</div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
-        const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab'; // Match ESP32
-        const FAIL_CHAR_UUID = '87654321-4321-4321-4321-210987654321'; // Failure Prob
-        const SENSOR_CHAR_UUID = 'abcdef01-1234-5678-90ab-cdef01234567'; // Live Sensors
+        // --- CONFIG MATCHING MAIN.CPP ---
+        const SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+        const CHAR_PROB_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a9';  // Float
+        const CHAR_ALERT_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26aa'; // String
+        const CHAR_SENSORS_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26ab'; // JSON
 
-        // --- 2. CHART SETUP ---
         const ctx = document.getElementById('mainChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
@@ -155,143 +132,122 @@
                 datasets: [
                     { label: 'RPM', data: Array(20).fill(0), borderColor: '#22d3ee', tension: 0.4 },
                     { label: 'Temp', data: Array(20).fill(0), borderColor: '#fb923c', tension: 0.4 },
-                    { label: 'Load', data: Array(20).fill(0), borderColor: '#c084fc', tension: 0.4 }
+                    { label: 'Pressure', data: Array(20).fill(0), borderColor: '#c084fc', tension: 0.4 }
                 ]
             },
             options: {
                 responsive: true,
                 plugins: { legend: { display: false } },
-                scales: {
-                    x: { display: false },
-                    y: { grid: { color: '#334155' }, suggestMin: 0, suggestMax: 100 }
-                },
+                scales: { x: { display: false }, y: { grid: { color: '#334155' } } },
                 animation: false
             }
         });
 
-        // --- 3. STATE ---
-        let device, server, failChar, sensorChar;
-        let isConnected = false;
+        let device, server, probChar, alertChar, sensorChar;
 
         function log(msg) {
             const el = document.getElementById('console-log');
-            const time = new Date().toLocaleTimeString();
-            el.innerHTML += `<div><span class="text-slate-600">[${time}]</span> ${msg}</div>`;
+            el.innerHTML += `<div><span class="text-slate-600">[${new Date().toLocaleTimeString()}]</span> ${msg}</div>`;
             el.scrollTop = el.scrollHeight;
         }
 
-        // --- 4. BLUETOOTH LOGIC ---
         async function connectBLE() {
             try {
-                log('Scanning for FEDXAI_DONGLE...');
+                log('Scanning for FedXAI-Dongle...');
                 device = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
+                    filters: [{ name: 'FedXAI-Dongle' }],
                     optionalServices: [SERVICE_UUID]
                 });
 
                 log(`Connecting to ${device.name}...`);
-                setConnectionStatus('Connecting...', 'bg-yellow-500');
+                document.getElementById('status-text').innerText = 'Connecting...';
 
                 server = await device.gatt.connect();
                 const service = await server.getPrimaryService(SERVICE_UUID);
 
-                log('Service found. Getting characteristics...');
-                failChar = await service.getCharacteristic(FAIL_CHAR_UUID);
-                sensorChar = await service.getCharacteristic(SENSOR_CHAR_UUID);
+                log('Getting characteristics...');
+                probChar = await service.getCharacteristic(CHAR_PROB_UUID);
+                alertChar = await service.getCharacteristic(CHAR_ALERT_UUID);
+                sensorChar = await service.getCharacteristic(CHAR_SENSORS_UUID);
 
-                // Start Notifications
-                await failChar.startNotifications();
-                failChar.addEventListener('characteristicvaluechanged', handleFailData);
+                await probChar.startNotifications();
+                probChar.addEventListener('characteristicvaluechanged', handleProb);
 
-                await sensorChar.startNotifications();
-                sensorChar.addEventListener('characteristicvaluechanged', handleSensorData);
+                await alertChar.startNotifications();
+                alertChar.addEventListener('characteristicvaluechanged', handleAlert);
 
-                isConnected = true;
-                setConnectionStatus('Connected', 'bg-green-500');
-                log('Connected! Streaming data...');
+                await sensorChar.startNotifications(); // Ensure firmware supports notify on this char
+                sensorChar.addEventListener('characteristicvaluechanged', handleSensors);
+
+                // If firmware doesn't notify specific chars, we might need a read loop
+                // But Phase 4.2 firmware uses notify() for all.
+
+                document.getElementById('status-text').innerText = 'Connected';
+                document.getElementById('status-dot').className = 'status-dot bg-green-500';
+                log('Connected! Listening for streams...');
 
             } catch (error) {
                 log(`Error: ${error}`);
-                setConnectionStatus('Failed', 'bg-red-500');
+                document.getElementById('status-text').innerText = 'Error';
+                document.getElementById('status-dot').className = 'status-dot bg-red-500';
             }
         }
 
-        function setConnectionStatus(text, colorClass) {
-            document.getElementById('status-text').innerText = text;
-            document.getElementById('status-dot').className = `status-dot ${colorClass}`;
-            if (text === 'Connected') {
-                document.getElementById('connection-status').classList.add('border-green-500/50');
-            }
-        }
-
-        // --- 5. DATA HANDLERS ---
-        function handleFailData(event) {
-            const val = event.target.value.getFloat32(0, true); // Little-endian
+        function handleProb(event) {
+            const val = event.target.value.getFloat32(0, true);
             const prob = (val * 100).toFixed(1);
 
             document.getElementById('fail-prob').innerText = `${prob}%`;
             document.getElementById('fail-bar').style.width = `${prob}%`;
             document.getElementById('health-score').innerText = `${(100 - prob).toFixed(0)}%`;
 
-            // Alert Logic
-            const alertBox = document.getElementById('alert-box');
+            // UI State Update
+            const isFail = val > 0.5;
             const healthStatus = document.getElementById('health-status');
-            const healthBg = document.getElementById('health-bg');
+            const bg = document.getElementById('health-bg');
 
-            if (val > 0.5) {
-                // FAILURE MODE
-                alertBox.className = "glass p-4 rounded-xl border-l-4 border-red-500 bg-red-900/20";
-                document.getElementById('xai-msg').innerHTML =
-                    `<span class="text-red-400 font-bold">CRITICAL ALERT:</span> Check Fuel Filter & Pump. High Pressure Drop detected.`;
-
+            if (isFail) {
                 healthStatus.className = "text-sm text-red-200 font-medium px-3 py-1 bg-red-900/60 rounded-full inline-block relative z-10";
                 healthStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> FAILURE IMMINENT`;
-                healthBg.className = "absolute inset-0 bg-red-500/10 animate-pulse";
+                bg.className = "absolute inset-0 bg-red-500/10 animate-pulse";
+                document.getElementById('alert-box').className = "glass p-4 rounded-xl border-l-4 border-red-500 bg-red-900/20";
             } else {
-                // HEALTHY MODE
-                alertBox.className = "glass p-4 rounded-xl border-l-4 border-green-500";
-                document.getElementById('xai-msg').innerText = "System operating within normal parameters.";
-
                 healthStatus.className = "text-sm text-green-200 font-medium px-3 py-1 bg-green-900/40 rounded-full inline-block relative z-10";
                 healthStatus.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i> HEALTHY`;
-                healthBg.className = "absolute inset-0 bg-green-500/10";
+                bg.className = "absolute inset-0 bg-green-500/10";
+                document.getElementById('alert-box').className = "glass p-4 rounded-xl border-l-4 border-green-500";
             }
         }
 
-        function handleSensorData(event) {
-            // Simulated parsing (assuming standard struct packing)
-            // ESP32 sends: float rpm, float temp, float load (12 bytes)
-            const rpm = event.target.value.getFloat32(0, true);
-            const temp = event.target.value.getFloat32(4, true);
-            const load = event.target.value.getFloat32(8, true);
-
-            // Update UI
-            document.getElementById('val-rpm').innerText = rpm.toFixed(0);
-            document.getElementById('val-temp').innerText = temp.toFixed(1) + '°';
-            document.getElementById('val-load').innerText = load.toFixed(1) + '%';
-
-            // Push to Chart
-            chart.data.datasets[0].data.push(rpm / 80); // Scale RPM (8000 max -> 100)
-            chart.data.datasets[1].data.push(temp);     // Temp is usually 0-120
-            chart.data.datasets[2].data.push(load);     // Load is 0-100
-
-            chart.data.datasets.forEach(ds => ds.data.shift());
-            chart.update('none'); // Perf opt
+        function handleAlert(event) {
+            const dec = new TextDecoder();
+            const msg = dec.decode(event.target.value);
+            document.getElementById('xai-msg').innerText = msg;
         }
 
-        // --- SIMULATION MODE (Testing without Dongle) ---
-        // Uncomment to test UI without hardware
-        /*
-        setInterval(() => {
-            const rpm = 2000 + Math.random() * 500;
-            const temp = 85 + Math.random() * 5;
-            const load = 40 + Math.random() * 10;
-            const prob = Math.random() > 0.8 ? 0.9 : 0.05; // Random spikes
+        function handleSensors(event) {
+            const dec = new TextDecoder();
+            const jsonStr = dec.decode(event.target.value);
+            try {
+                const data = JSON.parse(jsonStr);
 
-            handleSensorData({ target: { value: { getFloat32: (o) => [rpm, temp, load][o/4] } } });
-            handleFailData({ target: { value: { getFloat32: () => prob } } });
-        }, 1000);
-        */
+                // Update Gauges
+                document.getElementById('val-rpm').innerText = data.rpm;
+                document.getElementById('val-temp').innerText = data.ct + '°';
+                document.getElementById('val-fp').innerText = data.fp;
+
+                // Update Chart
+                chart.data.datasets[0].data.push(data.rpm / 80); // Scaled RPM
+                chart.data.datasets[1].data.push(data.ct);       // Temp
+                chart.data.datasets[2].data.push(data.fp * 10);  // Pressure (Bar -> scaled for vis)
+
+                chart.data.datasets.forEach(ds => ds.data.shift());
+                chart.update('none');
+
+            } catch (e) {
+                console.error("JSON Parse Error", e);
+            }
+        }
     </script>
 </body>
 
