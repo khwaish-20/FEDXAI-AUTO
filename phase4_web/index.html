@@ -49,6 +49,13 @@
                 <span class="status-dot bg-slate-500" id="status-dot"></span>
                 <span id="status-text">Disconnected</span>
             </div>
+
+            <!-- DEMO BUTTON -->
+            <button onclick="startSimulation()"
+                class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-medium transition-all border border-slate-500">
+                <i class="fa-solid fa-play mr-2"></i> Demo Mode
+            </button>
+
             <button onclick="connectBLE()"
                 class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-lg shadow-blue-500/20">
                 <i class="fa-brands fa-bluetooth-b mr-2"></i> Connect Dongle
@@ -120,9 +127,9 @@
     <script>
         // --- CONFIG MATCHING MAIN.CPP ---
         const SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
-        const CHAR_PROB_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a9';  // Float
-        const CHAR_ALERT_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26aa'; // String
-        const CHAR_SENSORS_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26ab'; // JSON
+        const CHAR_PROB_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a9';
+        const CHAR_ALERT_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26aa';
+        const CHAR_SENSORS_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26ab';
 
         const ctx = document.getElementById('mainChart').getContext('2d');
         const chart = new Chart(ctx, {
@@ -144,6 +151,7 @@
         });
 
         let device, server, probChar, alertChar, sensorChar;
+        let simInterval;
 
         function log(msg) {
             const el = document.getElementById('console-log');
@@ -152,7 +160,12 @@
         }
 
         async function connectBLE() {
+            clearInterval(simInterval);
             try {
+                if (!navigator.bluetooth) {
+                    throw new Error("Web Bluetooth API not available (use Chrome/Edge)");
+                }
+
                 log('Scanning for FedXAI-Dongle...');
                 device = await navigator.bluetooth.requestDevice({
                     filters: [{ name: 'FedXAI-Dongle' }],
@@ -165,88 +178,103 @@
                 server = await device.gatt.connect();
                 const service = await server.getPrimaryService(SERVICE_UUID);
 
-                log('Getting characteristics...');
                 probChar = await service.getCharacteristic(CHAR_PROB_UUID);
                 alertChar = await service.getCharacteristic(CHAR_ALERT_UUID);
                 sensorChar = await service.getCharacteristic(CHAR_SENSORS_UUID);
 
                 await probChar.startNotifications();
-                probChar.addEventListener('characteristicvaluechanged', handleProb);
+                probChar.addEventListener('characteristicvaluechanged', (e) => updateProbUI(e.target.value.getFloat32(0, true)));
 
                 await alertChar.startNotifications();
-                alertChar.addEventListener('characteristicvaluechanged', handleAlert);
+                alertChar.addEventListener('characteristicvaluechanged', (e) => updateAlertUI(new TextDecoder().decode(e.target.value)));
 
-                await sensorChar.startNotifications(); // Ensure firmware supports notify on this char
-                sensorChar.addEventListener('characteristicvaluechanged', handleSensors);
-
-                // If firmware doesn't notify specific chars, we might need a read loop
-                // But Phase 4.2 firmware uses notify() for all.
+                await sensorChar.startNotifications();
+                sensorChar.addEventListener('characteristicvaluechanged', (e) => {
+                    const data = JSON.parse(new TextDecoder().decode(e.target.value));
+                    updateDashboard(data.rpm, data.ct, data.fp);
+                });
 
                 document.getElementById('status-text').innerText = 'Connected';
                 document.getElementById('status-dot').className = 'status-dot bg-green-500';
                 log('Connected! Listening for streams...');
 
             } catch (error) {
-                log(`Error: ${error}`);
+                log(`Error: ${error.message || error}`);
                 document.getElementById('status-text').innerText = 'Error';
                 document.getElementById('status-dot').className = 'status-dot bg-red-500';
             }
         }
 
-        function handleProb(event) {
-            const val = event.target.value.getFloat32(0, true);
+        // --- SHARED UI UPDATERS ---
+        function updateProbUI(val) {
             const prob = (val * 100).toFixed(1);
-
             document.getElementById('fail-prob').innerText = `${prob}%`;
             document.getElementById('fail-bar').style.width = `${prob}%`;
             document.getElementById('health-score').innerText = `${(100 - prob).toFixed(0)}%`;
 
-            // UI State Update
             const isFail = val > 0.5;
             const healthStatus = document.getElementById('health-status');
             const bg = document.getElementById('health-bg');
+            const alertBox = document.getElementById('alert-box');
 
             if (isFail) {
                 healthStatus.className = "text-sm text-red-200 font-medium px-3 py-1 bg-red-900/60 rounded-full inline-block relative z-10";
                 healthStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> FAILURE IMMINENT`;
                 bg.className = "absolute inset-0 bg-red-500/10 animate-pulse";
-                document.getElementById('alert-box').className = "glass p-4 rounded-xl border-l-4 border-red-500 bg-red-900/20";
+                alertBox.className = "glass p-4 rounded-xl border-l-4 border-red-500 bg-red-900/20";
             } else {
                 healthStatus.className = "text-sm text-green-200 font-medium px-3 py-1 bg-green-900/40 rounded-full inline-block relative z-10";
                 healthStatus.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i> HEALTHY`;
                 bg.className = "absolute inset-0 bg-green-500/10";
-                document.getElementById('alert-box').className = "glass p-4 rounded-xl border-l-4 border-green-500";
+                alertBox.className = "glass p-4 rounded-xl border-l-4 border-green-500";
             }
         }
 
-        function handleAlert(event) {
-            const dec = new TextDecoder();
-            const msg = dec.decode(event.target.value);
+        function updateAlertUI(msg) {
             document.getElementById('xai-msg').innerText = msg;
         }
 
-        function handleSensors(event) {
-            const dec = new TextDecoder();
-            const jsonStr = dec.decode(event.target.value);
-            try {
-                const data = JSON.parse(jsonStr);
+        function updateDashboard(rpm, temp, pressure) {
+            document.getElementById('val-rpm').innerText = rpm.toFixed(0);
+            document.getElementById('val-temp').innerText = temp.toFixed(1) + '°';
+            document.getElementById('val-fp').innerText = pressure.toFixed(2);
 
-                // Update Gauges
-                document.getElementById('val-rpm').innerText = data.rpm;
-                document.getElementById('val-temp').innerText = data.ct + '°';
-                document.getElementById('val-fp').innerText = data.fp;
+            chart.data.datasets[0].data.push(rpm / 80);
+            chart.data.datasets[1].data.push(temp);
+            chart.data.datasets[2].data.push(pressure * 10);
 
-                // Update Chart
-                chart.data.datasets[0].data.push(data.rpm / 80); // Scaled RPM
-                chart.data.datasets[1].data.push(data.ct);       // Temp
-                chart.data.datasets[2].data.push(data.fp * 10);  // Pressure (Bar -> scaled for vis)
+            chart.data.datasets.forEach(ds => ds.data.shift());
+            chart.update('none');
+        }
 
-                chart.data.datasets.forEach(ds => ds.data.shift());
-                chart.update('none');
+        // --- DEMO MODE ---
+        function startSimulation() {
+            if (simInterval) clearInterval(simInterval);
+            log('Starting Demo Simulation...');
+            document.getElementById('status-text').innerText = 'Demo Mode';
+            document.getElementById('status-dot').className = 'status-dot bg-blue-500';
 
-            } catch (e) {
-                console.error("JSON Parse Error", e);
-            }
+            let t = 0;
+            simInterval = setInterval(() => {
+                t += 0.1;
+                // Generate fake sensor data
+                const rpm = 3000 + Math.sin(t) * 1000 + Math.random() * 200; // 2000-4000 RPM
+                const temp = 90 + Math.sin(t * 0.5) * 10 + Math.random() * 2; // 80-100 C
+                const pressure = 3.5 + Math.cos(t) * 0.5; // 3-4 Bar
+
+                // Simulate periodic failure (every 20s)
+                const isFail = (Math.floor(t) % 20) > 15; // Last 5s of every 20s cycle
+                const prob = isFail ? 0.85 + Math.random() * 0.1 : 0.02 + Math.random() * 0.05;
+
+                updateDashboard(rpm, temp, pressure);
+                updateProbUI(prob);
+
+                if (isFail) {
+                    updateAlertUI("CRITICAL ALERT: High Coolant Temp & Pressure Drop detected. Check Pump.");
+                } else {
+                    updateAlertUI("System operating within normal parameters.");
+                }
+            }, 800);
         }
     </script>
 </body>
