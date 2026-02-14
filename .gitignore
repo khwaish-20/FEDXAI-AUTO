@@ -1,0 +1,66 @@
+# ========================
+# FEDXAI-AUTO .gitignore
+# ========================
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+*.egg
+
+# Large Data Files (regenerate with scripts)
+combined_processed_data.csv
+combined_raw_data.csv
+training_subset.csv
+ai4i2020.csv
+AI4I DATASET.zip
+simulated_data/
+honest_results.txt
+training_log.txt
+
+# Intermediate/Experimental Models (keep only production + edge)
+fedxai_global_model.keras
+fedxai_optimized_model.keras
+fedxai_advanced_global.keras
+fedxai_centralized.keras
+fedxai_edge_cnn.keras
+fedxai_edge_v2.keras
+fedxai_edge_final.keras
+fedxai_edge_gru.keras
+fedxai_edge_honest.keras
+fedxai_edge_v3.keras
+
+# Intermediate TFLite Models (keep only realistic)
+phase4_edge/fedxai_dynamic.tflite
+phase4_edge/fedxai_f16.tflite
+phase4_edge/fedxai_f32.tflite
+phase4_edge/fedxai_final.tflite
+phase4_edge/fedxai_int8.tflite
+phase4_edge/fedxai_honest.tflite
+phase4_edge/fedxai_v3.tflite
+
+# Experimental/Debug Scripts
+check_env.py
+check_tflite.py
+validate_tflite.py
+phase4_tinyml.py
+honest_evaluation.py
+final_honest_report.py
+federated_training.py
+federated_training_advanced.py
+federated_training_optimized.py
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+.DS_Store
+
+# Gemini
+.gemini/
+.agent/
