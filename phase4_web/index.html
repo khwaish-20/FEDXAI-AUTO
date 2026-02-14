@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FEDXAI Cockpit</title>
+    <title>FEDXAI V2 Cockpit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600;700&display=swap"
         rel="stylesheet">
     <style>
         body {
-            background-color: #050b14;
+            background-color: #020617;
             color: #e2e8f0;
             font-family: 'Rajdhani', sans-serif;
-            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #050b14 70%);
+            background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, #020617 60%);
             height: 100vh;
             overflow: hidden;
         }
@@ -26,405 +26,467 @@
         }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
         }
 
-        .gauge-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
+        .text-glow-blue {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
         }
 
-        .alert-pulse {
-            animation: pulse-red 1.5s infinite;
+        .text-glow-red {
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
         }
 
-        @keyframes pulse-red {
+        .nav-btn.active {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border-bottom: 2px solid #38bdf8;
+        }
+
+        /* Car Part Markers */
+        .part-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #334155;
+            border: 2px solid #94a3b8;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .part-marker::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 1px solid transparent;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .part-critical {
+            background: #ef4444;
+            border-color: #fee2e2;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse-marker 1s infinite;
+        }
+
+        /* Floating AR Label */
+        .ar-label {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Orbitron';
+            font-size: 10px;
+            white-space: nowrap;
+            display: none;
+            z-index: 20;
+            transform: translateY(-40px) translateX(-50%);
+        }
+
+        .part-critical+.ar-label {
+            display: block;
+            animation: float-up 0.5s ease-out;
+        }
+
+        @keyframes pulse-marker {
             0% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+                opacity: 1;
+                transform: scale(1);
             }
 
-            70% {
-                box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+            50% {
+                opacity: 0.8;
+                transform: scale(1.2);
             }
 
             100% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+                opacity: 1;
+                transform: scale(1);
             }
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
+        @keyframes float-up {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) translateX(-50%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(-40px) translateX(-50%);
+            }
         }
 
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 3px;
-        }
-
-        /* Car Part Highlighting */
-        .part-icon {
-            transition: all 0.3s;
-            opacity: 0.3;
-        }
-
-        .part-active {
-            opacity: 1;
-            color: #ef4444;
-            filter: drop-shadow(0 0 8px #ef4444);
+        /* SVG Car */
+        .car-svg-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            items-end: center;
+            opacity: 0.8;
+            background-image: url('https://raw.githubusercontent.com/khwaish-20/FEDXAI-AUTO/main/assets/car_wireframe.svg');
+            /* Fallback / Placeholder if needed */
         }
     </style>
 </head>
 
-<body class="p-4 flex flex-col h-screen">
+<body class="flex flex-col h-screen">
 
-    <!-- TOP BAR -->
-    <header class="flex justify-between items-center mb-6 px-4">
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center px-6 py-4 border-b border-slate-800 bg-slate-950/80 z-50">
         <div class="flex items-center gap-3">
-            <i class="fa-solid fa-microchip text-blue-400 text-2xl"></i>
-            <div>
-                <h1
-                    class="font-hud text-2xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-200">
-                    FEDXAI AUTO
-                </h1>
-                <p class="text-xs text-slate-500 tracking-[0.2em] uppercase">Edge Diagnostic System</p>
-            </div>
+            <i class="fa-solid fa-bolt text-cyan-400 text-xl"></i>
+            <h1 class="font-hud text-xl font-bold tracking-widest text-white">FEDXAI <span
+                    class="text-cyan-400">PRO</span></h1>
         </div>
+
+        <div class="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
+            <button onclick="showPage('live')" id="nav-live"
+                class="nav-btn active px-6 py-2 rounded text-sm font-bold tracking-wider text-slate-400 hover:text-white transition-all">
+                <i class="fa-solid fa-gauge-high mr-2"></i> LIVE COCKPIT
+            </button>
+            <button onclick="showPage('health')" id="nav-health"
+                class="nav-btn px-6 py-2 rounded text-sm font-bold tracking-wider text-slate-400 hover:text-white transition-all">
+                <i class="fa-solid fa-clipboard-check mr-2"></i> HEALTH REPORT
+            </button>
+        </div>
+
         <div class="flex gap-4">
             <button onclick="startSimulation()"
-                class="bg-slate-800 hover:bg-slate-700 text-cyan-400 px-4 py-2 rounded border border-slate-700 font-bold tracking-wider text-sm transition-all">
-                <i class="fa-solid fa-play mr-2"></i> DEMO
+                class="bg-slate-800 hover:bg-slate-700 text-cyan-400 px-3 py-1.5 rounded text-xs font-bold border border-slate-700">
+                <i class="fa-solid fa-play mr-1"></i> TEST
             </button>
-            <button id="btn-connect" onclick="connectBLE()"
-                class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded font-bold tracking-wider text-sm shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all">
-                <i class="fa-brands fa-bluetooth-b mr-2"></i> CONNECT
+            <button onclick="connectBLE()" id="btn-conn"
+                class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded text-xs font-bold shadow-lg shadow-blue-500/20">
+                CONNECT
             </button>
         </div>
-    </header>
+    </nav>
 
-    <!-- MAIN DASHBOARD GRID -->
-    <main class="grid grid-cols-12 gap-6 flex-1 overflow-hidden">
+    <!-- CONTENT AREA -->
+    <div class="relative flex-1 overflow-hidden p-6">
 
-        <!-- LEFT: METRICS & HEALTH -->
-        <div class="col-span-3 flex flex-col gap-4">
-            <!-- Health Score -->
-            <div class="glass-panel rounded-2xl p-6 text-center relative overflow-hidden group">
-                <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-all"></div>
-                <h3 class="text-slate-400 text-xs uppercase tracking-widest mb-2">Vehicle Integrity</h3>
-                <div class="font-hud text-6xl font-bold text-white mb-2" id="health-score">100%</div>
-                <div id="health-badge"
-                    class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-400 border border-green-500/30">
-                    OPTIMAL
+        <!-- PAGE 1: LIVE COCKPIT -->
+        <div id="page-live" class="h-full grid grid-cols-12 gap-6 transition-all duration-300">
+
+            <!-- LEFT: 3D CAR VISUALIZER (Big) -->
+            <div
+                class="col-span-8 glass-panel rounded-2xl relative flex items-center justify-center bg-gradient-to-b from-slate-900/50 to-transparent">
+                <div class="absolute top-4 left-4 font-hud text-xs text-slate-500 tracking-widest">VEHICLE STATUS
+                    MONITOR</div>
+
+                <!-- CAR CONTAINER -->
+                <div class="relative w-[80%] aspect-[2/1] bg-contain bg-no-repeat bg-center"
+                    style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Generic_Car_Side_Profile.svg/1280px-Generic_Car_Side_Profile.svg.png'); filter: invert(1) opacity(0.2);">
+
+                    <!-- PARTS (Positioned Relative to Image) -->
+                    <!-- 1. Engine Block -->
+                    <div id="pt-engine" class="part-marker" style="top: 40%; left: 25%;"></div>
+                    <div class="ar-label">ENGINE OVERHEAT</div>
+
+                    <!-- 2. Radiator (Front) -->
+                    <div id="pt-rad" class="part-marker" style="top: 45%; left: 12%;"></div>
+                    <div class="ar-label">COOLANT LEAK</div>
+
+                    <!-- 3. Transmission (Center) -->
+                    <div id="pt-trans" class="part-marker" style="top: 55%; left: 40%;"></div>
+                    <div class="ar-label">GEAR SLIPPAGE</div>
+
+                    <!-- 4. Fuel Pump (Rear Tank) -->
+                    <div id="pt-fuel" class="part-marker" style="top: 50%; left: 75%;"></div>
+                    <div class="ar-label">FUEL PUMP FAILURE</div>
+
+                    <!-- 5. Exhaust / Cat (Bottom) -->
+                    <div id="pt-exh" class="part-marker" style="top: 70%; left: 50%;"></div>
+                    <div class="ar-label">CATALYST EFFICIENCY</div>
+
+                    <!-- 6. Alternator (Front Top) -->
+                    <div id="pt-alt" class="part-marker" style="top: 35%; left: 20%;"></div>
+                    <div class="ar-label">VOLTAGE DROP</div>
+                </div>
+
+                <!-- ALERTS OVERLAY (Bottom) -->
+                <div id="live-alert-box"
+                    class="absolute bottom-6 left-6 right-6 glass-panel border-l-4 border-red-500 p-4 bg-red-950/40 hidden">
+                    <div class="flex items-center gap-4">
+                        <i class="fa-solid fa-triangle-exclamation text-3xl text-red-500 animate-pulse"></i>
+                        <div>
+                            <div class="font-hud text-red-400 font-bold text-lg">CRITICAL FAILURE DETECTED</div>
+                            <div class="text-sm text-slate-300" id="live-alert-msg">Engine coolant temperature exceeding
+                                safety limits.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Maintenance Estimator -->
-            <div class="glass-panel rounded-2xl p-6 flex-1 flex flex-col justify-center">
-                <h3 class="text-slate-400 text-xs uppercase tracking-widest mb-4">
-                    <i class="fa-solid fa-wrench mr-2"></i> Maintenance Prediction
-                </h3>
-                <div class="space-y-4">
+            <!-- RIGHT: GAUGES STACK -->
+            <div class="col-span-4 flex flex-col gap-4">
+                <!-- RPM (Hero Gauge) -->
+                <div class="glass-panel rounded-xl p-6 text-center relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-cyan-500/20 blur-3xl rounded-full"></div>
+                    <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Engine Speed</h3>
+                    <div class="font-hud text-6xl font-bold text-white mb-2" id="val-rpm">0</div>
+                    <div class="text-xs text-cyan-400 font-mono tracking-widest">RPM</div>
+
+                    <!-- RPM Bar -->
+                    <div class="mt-4 h-1 bg-slate-800 rounded-full overflow-hidden">
+                        <div id="bar-rpm" class="h-full bg-cyan-400 w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Secondary Metrics Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-panel rounded-xl p-4 text-center">
+                        <h3 class="text-slate-500 text-[10px] font-bold uppercase mb-1">Coolant</h3>
+                        <div class="font-hud text-3xl font-bold text-orange-400" id="val-ct">0°</div>
+                        <div class="text-[10px] text-slate-400 mt-1">CELSIUS</div>
+                    </div>
+                    <div class="glass-panel rounded-xl p-4 text-center">
+                        <h3 class="text-slate-500 text-[10px] font-bold uppercase mb-1">Pressure</h3>
+                        <div class="font-hud text-3xl font-bold text-purple-400" id="val-fp">0.0</div>
+                        <div class="text-[10px] text-slate-400 mt-1">BAR</div>
+                    </div>
+                    <div class="glass-panel rounded-xl p-4 text-center">
+                        <h3 class="text-slate-500 text-[10px] font-bold uppercase mb-1">Load</h3>
+                        <div class="font-hud text-3xl font-bold text-green-400" id="val-load">0%</div>
+                        <div class="text-[10px] text-slate-400 mt-1">ENGINE</div>
+                    </div>
+                    <div class="glass-panel rounded-xl p-4 text-center">
+                        <h3 class="text-slate-500 text-[10px] font-bold uppercase mb-1">Prob</h3>
+                        <div class="font-hud text-3xl font-bold text-red-400" id="val-prob">0%</div>
+                        <div class="text-[10px] text-slate-400 mt-1">FAILURE</div>
+                    </div>
+                </div>
+
+                <!-- Mini Chart -->
+                <div class="flex-1 glass-panel rounded-xl p-4 relative">
+                    <canvas id="miniChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 2: PREDICTIVE HEALTH REPORT -->
+        <div id="page-health" class="hidden h-full max-w-4xl mx-auto flex-col gap-6">
+
+            <div class="glass-panel rounded-2xl p-8 border-t-4 border-green-500" id="health-header">
+                <div class="flex justify-between items-start">
                     <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-slate-300">Estimated RUL</span>
-                            <span class="text-cyan-400 font-bold" id="rul-text">6 Months</span>
-                        </div>
-                        <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
-                            <div id="rul-bar" class="h-full bg-cyan-500 w-full transition-all duration-1000"></div>
-                        </div>
+                        <h2 class="font-hud text-2xl font-bold text-white mb-2">System Prognostics</h2>
+                        <p class="text-slate-400 text-sm">AI-driven Remaining Useful Life (RUL) estimation based on
+                            current sensor degradation patterns.</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-slate-500 uppercase tracking-widest mb-1">Overall Health</div>
+                        <div class="font-hud text-5xl font-bold text-green-400" id="rul-score">98%</div>
                     </div>
                 </div>
-                <div class="mt-6 p-3 bg-slate-900/50 rounded border-l-2 border-slate-600 text-xs text-slate-400"
-                    id="maint-advice">
-                    System healthy. Routine servicing recommended in 5,000 km.
+            </div>
+
+            <!-- COMPONENT LIST -->
+            <div class="grid grid-cols-2 gap-6">
+                <!-- 1. Fuel System -->
+                <div class="glass-panel rounded-xl p-5 hover:bg-slate-800/50 transition-colors group">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded bg-blue-900/30 flex items-center justify-center text-blue-400">
+                                <i class="fa-solid fa-gas-pump"></i>
+                            </div>
+                            <span class="font-bold text-slate-200">Fuel Injection System</span>
+                        </div>
+                        <span class="text-green-400 font-hud text-sm" id="rul-fuel">6+ Months</span>
+                    </div>
+                    <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-green-500 w-[95%]" id="bar-fuel"></div>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 group-hover:text-slate-400">Pressure stable at 3.5 Bar. Trim
+                        values nominal.</p>
+                </div>
+
+                <!-- 2. Cooling System -->
+                <div class="glass-panel rounded-xl p-5 hover:bg-slate-800/50 transition-colors group">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded bg-orange-900/30 flex items-center justify-center text-orange-400">
+                                <i class="fa-solid fa-temperature-full"></i>
+                            </div>
+                            <span class="font-bold text-slate-200">Cooling System</span>
+                        </div>
+                        <span class="text-green-400 font-hud text-sm" id="rul-cool">6+ Months</span>
+                    </div>
+                    <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-green-500 w-[92%]" id="bar-cool"></div>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 group-hover:text-slate-400">Thermostat responsive. Fan cycle
+                        normal.</p>
+                </div>
+
+                <!-- 3. Engine Block -->
+                <div class="glass-panel rounded-xl p-5 hover:bg-slate-800/50 transition-colors group">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded bg-purple-900/30 flex items-center justify-center text-purple-400">
+                                <i class="fa-solid fa-gears"></i>
+                            </div>
+                            <span class="font-bold text-slate-200">Engine Internals</span>
+                        </div>
+                        <span class="text-green-400 font-hud text-sm" id="rul-eng">6+ Months</span>
+                    </div>
+                    <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-green-500 w-[98%]" id="bar-eng"></div>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 group-hover:text-slate-400">Vibration within tolerance. Oil
+                        pressure good.</p>
+                </div>
+
+                <!-- 4. Catalyst -->
+                <div class="glass-panel rounded-xl p-5 hover:bg-slate-800/50 transition-colors group">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded bg-slate-700/30 flex items-center justify-center text-slate-400">
+                                <i class="fa-solid fa-smog"></i>
+                            </div>
+                            <span class="font-bold text-slate-200">Exhaust Catalyst</span>
+                        </div>
+                        <span class="text-yellow-400 font-hud text-sm" id="rul-cat">4 Months</span>
+                    </div>
+                    <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-yellow-500 w-[75%]" id="bar-cat"></div>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 group-hover:text-slate-400">Efficiency slightly reduced (P0420
+                        pending).</p>
+                </div>
+            </div>
+
+            <div class="mt-4 p-4 glass-panel border border-slate-700 rounded-xl flex gap-4 items-center">
+                <i class="fa-solid fa-circle-info text-blue-400 text-xl"></i>
+                <div class="text-sm text-slate-400">
+                    Calculations based on <strong>FEDXAI-Edge Model v4.1</strong> inference on last 500km driving data.
+                    <br>Next scheduled scan: <strong>Feb 15, 2026</strong>.
                 </div>
             </div>
         </div>
 
-        <!-- CENTER: VISUAL TWIN & ALERTS -->
-        <div class="col-span-6 flex flex-col relative">
-            <!-- XAI Alert Overlay (Bottom Centered) -->
-            <div id="alert-overlay" class="absolute bottom-4 left-4 right-4 z-20 hidden">
-                <div
-                    class="glass-panel bg-red-900/40 border-red-500/50 p-4 rounded-xl flex items-start gap-4 alert-pulse">
-                    <div
-                        class="bg-red-500 text-black w-10 h-10 rounded flex items-center justify-center font-bold text-xl shrink-0">
-                        !
-                    </div>
-                    <div>
-                        <h4 class="font-hud text-red-400 font-bold text-lg mb-1">CRITICAL FAILURE DETECTED</h4>
-                        <p class="text-slate-200 text-sm mb-2" id="alert-msg">Engine coolant temperature critical.</p>
-                        <div class="text-xs text-red-200 bg-red-950/50 p-2 rounded border border-red-500/20 font-mono">
-                            <i class="fa-solid fa-magnifying-glass-chart mr-2"></i> Only 20km remaining before permanent
-                            damage.
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Car Visual (Abstract) -->
-            <div class="flex-1 glass-panel rounded-2xl relative flex items-center justify-center p-8">
-                <!-- SVG Car Silhouette -->
-                <div class="relative w-full max-w-md aspect-[1.5]">
-                    <!-- Base Car -->
-                    <i
-                        class="fa-solid fa-car-side text-slate-800 text-[18rem] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
-
-                    <!-- Parts (Overlay Icons) -->
-                    <!-- Engine -->
-                    <div id="part-engine" class="part-icon absolute top-[35%] left-[25%] flex flex-col items-center">
-                        <i class="fa-solid fa-engine text-4xl mb-1"></i>
-                        <span class="text-[10px] font-bold uppercase bg-black/50 px-1 rounded">Engine</span>
-                    </div>
-
-                    <!-- Exhaust/Catalyst -->
-                    <div id="part-exhaust"
-                        class="part-icon absolute bottom-[30%] left-[45%] flex flex-col items-center">
-                        <i class="fa-solid fa-fire-burner text-3xl mb-1"></i>
-                        <span class="text-[10px] font-bold uppercase bg-black/50 px-1 rounded">Catalyst</span>
-                    </div>
-
-                    <!-- Fuel System -->
-                    <div id="part-fuel" class="part-icon absolute top-[45%] right-[25%] flex flex-col items-center">
-                        <i class="fa-solid fa-gas-pump text-3xl mb-1"></i>
-                        <span class="text-[10px] font-bold uppercase bg-black/50 px-1 rounded">Fuel</span>
-                    </div>
-
-                    <!-- Cooling -->
-                    <div id="part-coolant" class="part-icon absolute top-[20%] left-[28%] flex flex-col items-center">
-                        <i class="fa-solid fa-temperature-arrow-up text-3xl mb-1"></i>
-                        <span class="text-[10px] font-bold uppercase bg-black/50 px-1 rounded">Cooling</span>
-                    </div>
-                </div>
-
-                <!-- Probability Gauge (Bg) -->
-                <div class="absolute top-4 right-4 text-right">
-                    <div class="text-xs text-slate-500 uppercase tracking-widest">Failure Probability</div>
-                    <div class="font-hud text-4xl text-slate-300" id="prob-val">0.0%</div>
-                </div>
-            </div>
-
-            <!-- Chart -->
-            <div class="h-32 mt-4 glass-panel rounded-xl p-3">
-                <canvas id="liveChart"></canvas>
-            </div>
-        </div>
-
-        <!-- RIGHT: XAI DIAGNOSTICS "THE WHY" -->
-        <div class="col-span-3 flex flex-col gap-4">
-            <div class="glass-panel rounded-2xl p-6 flex-1 overflow-y-auto">
-                <h3 class="text-cyan-400 font-bold mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-brain"></i> AI DIAGNOSTICS
-                </h3>
-
-                <div class="space-y-6" id="xai-feed">
-                    <!-- Default State -->
-                    <div class="text-center py-10 opacity-50">
-                        <i class="fa-solid fa-satellite-dish text-4xl mb-4 text-slate-600"></i>
-                        <p class="text-sm">Waiting for telemetry...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sensor Grid (Mini) -->
-            <div class="glass-panel rounded-xl p-4 grid grid-cols-2 gap-3 text-center">
-                <div class="bg-slate-900/50 rounded p-2 border border-slate-700">
-                    <div class="text-[10px] text-slate-500 uppercase">RPM</div>
-                    <div class="font-mono text-cyan-300 font-bold" id="val-rpm">0</div>
-                </div>
-                <div class="bg-slate-900/50 rounded p-2 border border-slate-700">
-                    <div class="text-[10px] text-slate-500 uppercase">TEMP</div>
-                    <div class="font-mono text-orange-300 font-bold" id="val-temp">0°</div>
-                </div>
-                <div class="bg-slate-900/50 rounded p-2 border border-slate-700">
-                    <div class="text-[10px] text-slate-500 uppercase">PRESS</div>
-                    <div class="font-mono text-purple-300 font-bold" id="val-fp">0.0</div>
-                </div>
-                <div class="bg-slate-900/50 rounded p-2 border border-slate-700">
-                    <div class="text-[10px] text-slate-500 uppercase">LOAD</div>
-                    <div class="font-mono text-green-300 font-bold">45%</div>
-                </div>
-            </div>
-        </div>
-    </main>
+    </div>
 
     <script>
-        // --- LOGIC ---
-        const SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
-        const CHAR_PROB_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a9';
-        const CHAR_ALERT_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26aa';
-        const CHAR_SENSORS_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26ab';
+        // --- PAGE NAVIGATION ---
+        function showPage(pageId) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`nav-${pageId}`).classList.add('active');
 
-        // Chart Setup
-        const ctx = document.getElementById('liveChart').getContext('2d');
+            document.getElementById('page-live').classList.add('hidden');
+            document.getElementById('page-health').classList.add('hidden');
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+
+            // Layout specific fix
+            if (pageId === 'live') {
+                document.getElementById('page-live').classList.add('grid');
+                document.getElementById('page-live').classList.remove('hidden');
+            } else {
+                document.getElementById('page-health').classList.add('flex');
+                document.getElementById('page-health').classList.remove('hidden');
+            }
+        }
+
+        // --- CHART ---
+        const ctx = document.getElementById('miniChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: Array(30).fill(''),
+                labels: Array(20).fill(''),
                 datasets: [
-                    { label: 'RPM', data: Array(30).fill(0), borderColor: '#22d3ee', borderWidth: 2, tension: 0.4, pointRadius: 0 },
-                    { label: 'Temp', data: Array(30).fill(0), borderColor: '#f97316', borderWidth: 2, tension: 0.4, pointRadius: 0 },
-                    { label: 'Press', data: Array(30).fill(0), borderColor: '#c084fc', borderWidth: 2, tension: 0.4, pointRadius: 0 }
+                    { label: 'RPM', data: Array(20).fill(0), borderColor: '#22d3ee', borderWidth: 2, tension: 0.4, pointRadius: 0 },
+                    { label: 'Temp', data: Array(20).fill(0), borderColor: '#f97316', borderWidth: 2, tension: 0.4, pointRadius: 0 }
                 ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: { x: { display: false }, y: { display: false } },
                 animation: false
             }
         });
 
+        // --- CORE LOGIC ---
         let simInterval;
 
-        // --- CORE FUNCTIONS ---
-
-        function updateUI(data) {
-            // Update Mini Grid
+        function updateLiveUI(data) {
+            // Update Gauges
             document.getElementById('val-rpm').innerText = data.rpm.toFixed(0);
-            document.getElementById('val-temp').innerText = data.ct.toFixed(1) + '°';
+            document.getElementById('val-ct').innerText = data.ct.toFixed(1) + '°';
             document.getElementById('val-fp').innerText = data.fp.toFixed(1);
+            document.getElementById('val-load').innerText = (data.rpm / 80).toFixed(0) + '%';
+            document.getElementById('bar-rpm').style.width = Math.min(100, (data.rpm / 80)) + '%';
 
-            // Update Chart
-            chart.data.datasets[0].data.push(data.rpm / 80); // Norm RPM
+            // Chart
+            chart.data.datasets[0].data.push(data.rpm / 80);
             chart.data.datasets[1].data.push(data.ct);
-            chart.data.datasets[2].data.push(data.fp * 10);
             chart.data.datasets.forEach(ds => ds.data.shift());
             chart.update('none');
         }
 
-        function updateAnalysis(prob, alertMsg) {
-            prob = prob * 100;
-            document.getElementById('prob-val').innerText = prob.toFixed(1) + '%';
-            document.getElementById('health-score').innerText = (100 - prob).toFixed(0) + '%';
+        function triggerAlert(componentId, msg, isCritical) {
+            // Reset all markers
+            document.querySelectorAll('.part-critical').forEach(el => el.classList.remove('part-critical'));
+            document.getElementById('live-alert-box').classList.add('hidden');
 
-            const hlBadge = document.getElementById('health-badge');
-            const alertOverlay = document.getElementById('alert-overlay');
-            const alertText = document.getElementById('alert-msg');
-            const maintBar = document.getElementById('rul-bar');
-            const rulText = document.getElementById('rul-text');
-            const maintAdvice = document.getElementById('maint-advice');
+            // Probability Gauge
+            const prob = isCritical ? 85 + Math.random() * 5 : 2 + Math.random() * 3;
+            document.getElementById('val-prob').innerText = prob.toFixed(1) + '%';
+            document.getElementById('val-prob').className = `font-hud text-3xl font-bold ${isCritical ? 'text-red-500 animate-pulse' : 'text-green-500'}`;
 
-            // Reset Parts
-            document.querySelectorAll('.part-icon').forEach(el => el.classList.remove('part-active'));
+            if (isCritical) {
+                // Highlight Specific Part
+                const part = document.getElementById(componentId);
+                if (part) part.classList.add('part-critical');
 
-            if (prob > 50) {
-                // FAILURE MODE
-                hlBadge.className = "inline-block px-3 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30";
-                hlBadge.innerText = "CRITICAL";
+                // Show Live Alert Box
+                const alertBox = document.getElementById('live-alert-box');
+                alertBox.classList.remove('hidden');
+                document.getElementById('live-alert-msg').innerText = msg;
 
-                alertOverlay.classList.remove('hidden');
-                alertText.innerText = alertMsg;
+                // Update Health Page (Red/Warning State)
+                document.getElementById('health-header').className = "glass-panel rounded-2xl p-8 border-t-4 border-red-500 alert-pulse";
+                document.getElementById('rul-score').innerText = "CRITICAL";
+                document.getElementById('rul-score').className = "font-hud text-5xl font-bold text-red-500";
 
-                maintBar.style.width = "5%";
-                maintBar.className = "h-full bg-red-500 w-full alert-pulse";
-                rulText.innerText = "IMMEDIATE";
-                rulText.className = "text-red-500 font-bold alert-pulse";
-                maintAdvice.innerText = "Stop vehicle immediately to prevent permanent failure.";
-
-                // XAI: Highlight Parts based on message
-                const xaiContainer = document.getElementById('xai-feed');
-                let reason = "Unknown anomaly detected.";
-
-                if (alertMsg.includes("Fuel")) {
-                    document.getElementById('part-fuel').classList.add('part-active');
-                    reason = "Fuel Pressure dropped below 2.0 Bar. Likely Filter Clog.";
-                } else if (alertMsg.includes("Coolant") || alertMsg.includes("Temp")) {
-                    document.getElementById('part-coolant').classList.add('part-active');
-                    document.getElementById('part-engine').classList.add('part-active');
-                    reason = "Engine Temp > 105°C. Check Radiator/Coolant.";
-                } else if (alertMsg.includes("O2") || alertMsg.includes("Catalyst")) {
-                    document.getElementById('part-exhaust').classList.add('part-active');
-                    reason = "Exhaust gas readings abnormal. Catalyst efficiency low.";
-                }
-
-                // AI Explanation Feed
-                xaiContainer.innerHTML = `
-                    <div class="bg-red-900/20 border-l-2 border-red-500 p-3 rounded mb-3">
-                        <div class="text-[10px] text-red-300 uppercase font-bold mb-1">Root Cause Analysis</div>
-                        <p class="text-sm text-slate-200">${reason}</p>
-                    </div>
-                `;
+                // Update specific health bar
+                if (componentId === 'pt-fuel') updateHealthBar('fuel', 'IMMEDIATE', '5%', 'bg-red-500');
+                if (componentId === 'pt-rad') updateHealthBar('cool', '1 Week', '10%', 'bg-red-500');
 
             } else {
-                // HEALTHY MODE
-                hlBadge.className = "inline-block px-3 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-400 border border-green-500/30";
-                hlBadge.innerText = "OPTIMAL";
-                alertOverlay.classList.add('hidden');
+                // Healthy State
+                document.getElementById('health-header').className = "glass-panel rounded-2xl p-8 border-t-4 border-green-500";
+                document.getElementById('rul-score').innerText = "98%";
+                document.getElementById('rul-score').className = "font-hud text-5xl font-bold text-green-400";
 
-                // RUL Logic
-                let months = "6+ Months";
-                let width = "100%";
-                let color = "bg-cyan-500";
-
-                if (prob > 10) { months = "3 Months"; width = "50%"; color = "bg-yellow-500"; }
-                if (prob > 30) { months = "1 Month"; width = "20%"; color = "bg-orange-500"; }
-
-                rulText.innerText = months;
-                maintBar.style.width = width;
-                maintBar.className = `h-full ${color} w-full transition-all duration-1000`;
-                maintAdvice.innerText = prob > 10 ? "Performance degrading. Schedule checkup soon." : "Vehicle operating at peak efficiency.";
-
-                // Clear XAI
-                document.getElementById('xai-feed').innerHTML = `
-                     <div class="text-center py-6 opacity-30">
-                        <i class="fa-solid fa-check text-green-500 text-2xl mb-2"></i>
-                        <p class="text-xs">No active faults.</p>
-                    </div>
-                `;
+                // Reset Bars
+                updateHealthBar('fuel', '6+ Months', '95%', 'bg-green-500');
+                updateHealthBar('cool', '6+ Months', '92%', 'bg-green-500');
             }
         }
 
-        // --- BLE CONNECTION ---
-        async function connectBLE() {
-            clearInterval(simInterval);
-            try {
-                const device = await navigator.bluetooth.requestDevice({
-                    filters: [{ name: 'FedXAI-Dongle' }],
-                    optionalServices: [SERVICE_UUID]
-                });
-
-                const server = await device.gatt.connect();
-                const service = await server.getPrimaryService(SERVICE_UUID);
-
-                // Subscribe... (Simplified for brevity, same logic as before)
-                const charProb = await service.getCharacteristic(CHAR_PROB_UUID);
-                await charProb.startNotifications();
-                charProb.addEventListener('characteristicvaluechanged', e => {
-                    const prob = e.target.value.getFloat32(0, true);
-                    window.lastProb = prob;
-                    // Wait for alert msg to update UI fully
-                });
-
-                const charAlert = await service.getCharacteristic(CHAR_ALERT_UUID);
-                await charAlert.startNotifications();
-                charAlert.addEventListener('characteristicvaluechanged', e => {
-                    const msg = new TextDecoder().decode(e.target.value);
-                    updateAnalysis(window.lastProb || 0, msg);
-                });
-
-                const charSens = await service.getCharacteristic(CHAR_SENSORS_UUID);
-                await charSens.startNotifications();
-                charSens.addEventListener('characteristicvaluechanged', e => {
-                    const data = JSON.parse(new TextDecoder().decode(e.target.value));
-                    updateUI(data);
-                });
-
-                document.getElementById('btn-connect').innerText = "CONNECTED";
-                document.getElementById('btn-connect').classList.replace("bg-blue-600", "bg-green-600");
-
-            } catch (e) {
-                alert("Connection Failed: " + e);
-            }
+        function updateHealthBar(id, text, width, colorClass) {
+            document.getElementById(`rul-${id}`).innerText = text;
+            document.getElementById(`rul-${id}`).className = `font-hud text-sm ${colorClass.replace('bg-', 'text-')}`;
+            document.getElementById(`bar-${id}`).className = `h-full w-full transition-all duration-1000 ${colorClass}`;
+            document.getElementById(`bar-${id}`).style.width = width;
         }
 
         // --- DEMO MODE ---
@@ -434,21 +496,90 @@
 
             simInterval = setInterval(() => {
                 t += 0.1;
-                // Generate Synethtic Data
-                const rpm = 2500 + Math.sin(t) * 1500;
-                const ct = 90 + Math.sin(t * 0.5) * 15;
-                const fp = 3.5 + Math.cos(t) * 1;
+                // Realistic data movement
+                const rpm = 3000 + Math.sin(t) * 1000 + (Math.random() * 100);
+                const ct = 90 + Math.sin(t * 0.5) * 5;
+                const fp = 3.5 + Math.cos(t) * 0.2;
 
-                updateUI({ rpm, ct, fp });
+                updateLiveUI({ rpm, ct, fp });
 
-                // Simulate Failure Trigger
-                if (Math.sin(t * 0.2) > 0.8) {
-                    // Logic for failure (High Temp)
-                    updateAnalysis(0.85, "CRITICAL: Engine Coolant Temp High (>105C). Possible Radiator Leak.");
-                } else {
-                    updateAnalysis(0.05, "System OK");
+                // Cycle through failures every 15s
+                const cycle = Math.floor(t) % 30;
+
+                if (cycle > 20 && cycle < 25) {
+                    // Fuel Pump Failure
+                    triggerAlert('pt-fuel', "Fuel Pressure Low. Pump efficiency < 60%.", true);
+                    updateLiveUI({ rpm: rpm * 0.8, ct: ct, fp: 1.8 }); // Drop pressure
                 }
+                else if (cycle > 25) {
+                    // Coolant Failure
+                    triggerAlert('pt-rad', "Coolant Temp Crtitical (>110C). Fan Failure.", true);
+                    updateLiveUI({ rpm: rpm, ct: 112, fp: fp }); // Spike temp
+                }
+                else {
+                    triggerAlert(null, "System OK", false);
+                }
+
             }, 500);
+        }
+
+        // --- BLE LOGIC ---
+        const SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+        const CHAR_PROB_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a9';
+        const CHAR_ALERT_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26aa';
+        const CHAR_SENSORS_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26ab';
+
+        async function connectBLE() {
+            clearInterval(simInterval);
+            try {
+                if (!navigator.bluetooth) throw new Error("Web Bluetooth API unavailable.");
+
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: 'FedXAI-Dongle' }],
+                    optionalServices: [SERVICE_UUID]
+                });
+
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService(SERVICE_UUID);
+
+                // Sensors
+                const charSens = await service.getCharacteristic(CHAR_SENSORS_UUID);
+                await charSens.startNotifications();
+                charSens.addEventListener('characteristicvaluechanged', e => {
+                    const data = JSON.parse(new TextDecoder().decode(e.target.value));
+                    updateLiveUI(data);
+                });
+
+                // Probability
+                const charProb = await service.getCharacteristic(CHAR_PROB_UUID);
+                await charProb.startNotifications();
+                charProb.addEventListener('characteristicvaluechanged', e => {
+                    const prob = e.target.value.getFloat32(0, true);
+                    document.getElementById('val-prob').innerText = (prob * 100).toFixed(1) + '%';
+
+                    if (prob > 0.5) {
+                        triggerAlert('pt-engine', "Anomaly Detected", true); // Generic alert if no XAI msg yet
+                    } else {
+                        triggerAlert(null, "System OK", false);
+                    }
+                });
+
+                // XAI Alert Text
+                const charAlert = await service.getCharacteristic(CHAR_ALERT_UUID);
+                await charAlert.startNotifications();
+                charAlert.addEventListener('characteristicvaluechanged', e => {
+                    const msg = new TextDecoder().decode(e.target.value);
+                    if (msg.includes("Fuel")) triggerAlert('pt-fuel', msg, true);
+                    else if (msg.includes("Coolant")) triggerAlert('pt-rad', msg, true);
+                    else triggerAlert(null, msg, false);
+                });
+
+                document.getElementById('btn-conn').innerText = "CONNECTED";
+                document.getElementById('btn-conn').classList.replace("bg-blue-600", "bg-green-600");
+
+            } catch (e) {
+                alert("Connection Failed: " + e);
+            }
         }
     </script>
 </body>
