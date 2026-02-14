@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FEDXAI V4 Ultimate Cockpit</title>
+    <title>FEDXAI V5 Ultimate</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -26,7 +26,7 @@
         }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(56, 189, 248, 0.15);
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
@@ -41,19 +41,21 @@
         /* Car Part Markers */
         .part-marker {
             position: absolute;
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             background: #334155;
             border: 2px solid #94a3b8;
             border-radius: 50%;
             cursor: pointer;
             z-index: 10;
             transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
         .part-marker:hover {
-            transform: scale(1.2);
+            transform: scale(1.3);
             border-color: #fff;
+            background: #38bdf8;
         }
 
         .part-critical {
@@ -75,7 +77,7 @@
             white-space: nowrap;
             display: none;
             z-index: 20;
-            transform: translateY(-35px) translateX(-50%);
+            transform: translateY(-40px) translateX(-50%);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
 
@@ -109,28 +111,34 @@
 
             to {
                 opacity: 1;
-                transform: translateY(-35px) translateX(-50%);
+                transform: translateY(-40px) translateX(-50%);
             }
         }
 
-        /* SVG Styling */
+        /* Custom Scrollbar */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* SVG Car Fill */
         .car-path {
-            fill: none;
-            stroke: #38bdf8;
+            stroke: #22d3ee;
             stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.5));
-        }
-
-        .car-fill {
-            fill: rgba(30, 41, 59, 0.3);
-        }
-
-        .wheel {
-            fill: none;
-            stroke: #94a3b8;
-            stroke-width: 2;
+            fill: rgba(30, 41, 59, 0.4);
+            filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.3));
         }
     </style>
 </head>
@@ -138,28 +146,29 @@
 <body class="flex flex-col h-screen">
 
     <!-- Navbar -->
-    <nav class="flex justify-between items-center px-4 py-3 border-b border-slate-800 bg-slate-950/90 z-50 h-14">
+    <nav
+        class="flex justify-between items-center px-4 py-3 border-b border-slate-800 bg-slate-950/90 z-50 h-14 shrink-0">
         <div class="flex items-center gap-3">
             <i class="fa-solid fa-bolt text-cyan-400 text-lg"></i>
             <h1 class="font-hud text-lg font-bold tracking-widest text-white">FEDXAI <span
-                    class="text-cyan-400">EVO</span></h1>
+                    class="text-cyan-400">PRO</span></h1>
         </div>
 
         <div class="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
             <button onclick="showPage('live')" id="nav-live"
                 class="nav-btn active px-4 py-1 rounded text-xs font-bold tracking-wider text-slate-400 hover:text-white transition-all">
-                <i class="fa-solid fa-gauge-high mr-2"></i> LIVE COCKPIT
+                <i class="fa-solid fa-gauge-high mr-2"></i> COCKPIT
             </button>
             <button onclick="showPage('health')" id="nav-health"
                 class="nav-btn px-4 py-1 rounded text-xs font-bold tracking-wider text-slate-400 hover:text-white transition-all">
-                <i class="fa-solid fa-clipboard-check mr-2"></i> HEALTH
+                <i class="fa-solid fa-heart-pulse mr-2"></i> HEALTH
             </button>
         </div>
 
         <div class="flex gap-2">
             <button onclick="startSimulation()"
-                class="bg-slate-800 hover:bg-slate-700 text-cyan-400 px-3 py-1 rounded text-[10px] font-bold border border-slate-700">
-                <i class="fa-solid fa-play mr-1"></i> TEST
+                class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded text-[10px] font-bold shadow-lg">
+                <i class="fa-solid fa-robot mr-1"></i> DEMO
             </button>
             <button onclick="connectBLE()" id="btn-conn"
                 class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-[10px] font-bold shadow-lg shadow-blue-500/20">
@@ -171,181 +180,240 @@
     <!-- CONTENT AREA -->
     <div class="relative flex-1 overflow-hidden p-4">
 
-        <!-- PAGE 1: LIVE COCKPIT (80/20 Split) -->
-        <div id="page-live" class="h-full grid grid-cols-12 gap-4 transition-all duration-300">
+        <!-- PAGE 1: LIVE COCKPIT (Left Gauges / Right Car) -->
+        <div id="page-live" class="h-full grid grid-cols-12 gap-4">
 
-            <!-- LEFT: CAR VISUALIZER (83% Width) -->
-            <div
-                class="col-span-10 glass-panel rounded-xl relative flex items-center justify-center bg-gradient-to-b from-slate-900/40 to-transparent overflow-hidden">
-                <div class="absolute top-3 left-3 font-hud text-[10px] text-slate-500 tracking-widest">VEHICLE STATUS
-                    MONITOR // ACTIVE</div>
+            <!-- LEFT: GAUGES (Equal Sized Grid) - 25% -->
+            <div class="col-span-3 h-full overflow-y-auto pr-2 flex flex-col gap-3">
 
-                <!-- SVG CAR (High Visibility) -->
-                <div class="relative w-[85%] h-full flex items-center justify-center">
-                    <svg viewBox="0 0 600 250" class="w-full h-auto drop-shadow-[0_0_20px_rgba(56,189,248,0.2)]">
-                        <!-- Detailed Sedan Outline -->
-                        <path
-                            d="M50,150 Q50,130 70,125 L150,110 L220,60 L400,60 L500,115 L560,125 Q580,130 580,150 L580,190 L530,190 A40,40 0 0,1 450,190 L180,190 A40,40 0 0,1 100,190 L50,190 Z"
-                            class="car-path" fill="rgba(15,23,42,0.5)" />
-
-                        <!-- Wheels -->
-                        <circle cx="140" cy="190" r="35" class="wheel" />
-                        <circle cx="490" cy="190" r="35" class="wheel" />
-
-                        <!-- Window Line -->
-                        <path d="M160,110 L230,70 L390,70 L490,115" class="car-path"
-                            style="stroke-width:1; opacity:0.6" />
-                    </svg>
-
-                    <!-- COMPONENT MARKERS (Absolute Positioned on Container) -->
-                    <!-- Engine (Front) -->
-                    <div id="pt-engine" class="part-marker" style="top: 50%; left: 25%;"></div>
-                    <div class="ar-label">ENGINE OVERHEAT</div>
-
-                    <!-- Radiator (Front Nose) -->
-                    <div id="pt-rad" class="part-marker" style="top: 55%; left: 12%;"></div>
-                    <div class="ar-label">COOLANT LEAK</div>
-
-                    <!-- Transmission (Center) -->
-                    <div id="pt-trans" class="part-marker" style="top: 65%; left: 45%;"></div>
-                    <div class="ar-label">GEAR SLIPPAGE</div>
-
-                    <!-- Fuel Tank (Rear) -->
-                    <div id="pt-fuel" class="part-marker" style="top: 55%; left: 80%;"></div>
-                    <div class="ar-label">FUEL PUMP FAILURE</div>
-
-                    <!-- Catalyst (Under Center) -->
-                    <div id="pt-exh" class="part-marker" style="top: 75%; left: 50%;"></div>
-                    <div class="ar-label">CATALYST EFFICIENCY</div>
-                </div>
-
-                <!-- ALERTS OVERLAY (Compact Bottom) -->
-                <div id="live-alert-box"
-                    class="absolute bottom-6 left-1/2 -translate-x-1/2 glass-panel border border-red-500/50 p-2 px-6 rounded-full bg-red-950/80 hidden flex items-center gap-3">
-                    <i class="fa-solid fa-triangle-exclamation text-red-500 animate-pulse"></i>
-                    <span class="font-hud text-red-400 font-bold text-sm" id="live-alert-msg">CRITICAL FAILURE
-                        DETECTED</span>
-                </div>
-            </div>
-
-            <!-- RIGHT: GAUGES STACK (17% Width) -->
-            <div class="col-span-2 flex flex-col gap-3 h-full">
-
-                <!-- MINI RPM (Compact) -->
+                <!-- RPM -->
                 <div
-                    class="glass-panel rounded-lg p-3 text-center relative overflow-hidden flex-1 flex flex-col justify-center">
-                    <h3 class="text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-1">RPM</h3>
-                    <div class="font-hud text-3xl font-bold text-white mb-1" id="val-rpm">0</div>
-                    <div class="text-[9px] text-cyan-400 font-mono">x1000</div>
-                    <div class="mt-2 h-1 bg-slate-800 rounded-full w-full mx-auto">
-                        <div id="bar-rpm" class="h-full bg-cyan-400 w-0 transition-all duration-300"></div>
+                    class="glass-panel rounded-lg p-4 flex flex-col justify-center items-center min-h-[140px] relative group h-full">
+                    <div class="absolute inset-0 bg-cyan-500/5 group-hover:bg-cyan-500/10 transition-colors"></div>
+                    <div
+                        class="w-10 h-10 rounded-full bg-cyan-900/30 flex items-center justify-center text-cyan-400 mb-2">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                    <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Engine RPM</h3>
+                    <div class="font-hud text-3xl font-bold text-white my-1" id="val-rpm">0</div>
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+                        <div id="bar-rpm" class="h-full bg-cyan-400 w-0 transition-all"></div>
                     </div>
                 </div>
 
-                <!-- Vertical Stats Stack -->
-                <div class="glass-panel rounded-lg p-3 text-center flex-1 flex flex-col justify-center">
-                    <h3 class="text-slate-500 text-[9px] font-bold uppercase mb-1">Temp</h3>
-                    <div class="font-hud text-xl font-bold text-orange-400" id="val-ct">0°</div>
-                    <div class="text-[8px] text-slate-400">deg C</div>
+                <!-- TEMP -->
+                <div
+                    class="glass-panel rounded-lg p-4 flex flex-col justify-center items-center min-h-[140px] relative group h-full">
+                    <div class="absolute inset-0 bg-orange-500/5 group-hover:bg-orange-500/10 transition-colors"></div>
+                    <div
+                        class="w-10 h-10 rounded-full bg-orange-900/30 flex items-center justify-center text-orange-400 mb-2">
+                        <i class="fa-solid fa-temperature-half"></i>
+                    </div>
+                    <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Coolant Temp</h3>
+                    <div class="font-hud text-3xl font-bold text-white my-1" id="val-ct">0°</div>
+                    <div class="text-[9px] text-orange-400">NORMAL RANGE</div>
                 </div>
 
-                <div class="glass-panel rounded-lg p-3 text-center flex-1 flex flex-col justify-center">
-                    <h3 class="text-slate-500 text-[9px] font-bold uppercase mb-1">Press</h3>
-                    <div class="font-hud text-xl font-bold text-purple-400" id="val-fp">0.0</div>
-                    <div class="text-[8px] text-slate-400">BAR</div>
+                <!-- PRESSURE -->
+                <div
+                    class="glass-panel rounded-lg p-4 flex flex-col justify-center items-center min-h-[140px] relative group h-full">
+                    <div class="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors"></div>
+                    <div
+                        class="w-10 h-10 rounded-full bg-purple-900/30 flex items-center justify-center text-purple-400 mb-2">
+                        <i class="fa-solid fa-wind"></i>
+                    </div>
+                    <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Fuel Pressure</h3>
+                    <div class="font-hud text-3xl font-bold text-white my-1" id="val-fp">0.0</div>
+                    <div class="text-[9px] text-purple-400">BAR</div>
                 </div>
 
-                <div class="glass-panel rounded-lg p-3 text-center flex-1 flex flex-col justify-center">
-                    <h3 class="text-slate-500 text-[9px] font-bold uppercase mb-1">Prob</h3>
-                    <div class="font-hud text-xl font-bold text-green-500" id="val-prob">0%</div>
+                <!-- FAILURE PROB -->
+                <div
+                    class="glass-panel rounded-lg p-4 flex flex-col justify-center items-center min-h-[140px] relative group h-full">
+                    <div
+                        class="w-10 h-10 rounded-full bg-red-900/30 flex items-center justify-center text-red-500 mb-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Risk Level</h3>
+                    <div class="font-hud text-3xl font-bold text-green-500 my-1" id="val-prob">0%</div>
+                    <div class="text-[9px] text-slate-400">AI CONFIDENCE</div>
+                </div>
+            </div>
+
+            <!-- RIGHT: CAR VISUAL (75%) -->
+            <div
+                class="col-span-9 glass-panel rounded-xl relative flex items-center justify-center bg-gradient-to-br from-slate-900/60 to-transparent overflow-hidden border-2 border-slate-800">
+
+                <!-- Background Grid -->
+                <div class="absolute inset-0"
+                    style="background-image: linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px); background-size: 40px 40px;">
                 </div>
 
-                <!-- Mini Chart -->
-                <div class="h-24 glass-panel rounded-lg p-2 relative">
+                <div class="absolute top-4 left-4 z-20">
+                    <div class="text-xs font-hud text-cyan-400 tracking-widest mb-1">DIGITAL TWIN // LIVE</div>
+                    <div class="h-0.5 w-12 bg-cyan-500"></div>
+                </div>
+
+                <!-- CAR SVG - HIGH VISIBILITY PATH -->
+                <div class="relative w-[90%] h-[80%] flex items-center justify-center z-10 p-10">
+                    <svg viewBox="0 0 800 350" class="w-full h-full drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]">
+                        <!-- Neon Outline Car -->
+                        <path
+                            d="M100,240 L120,180 L250,160 L350,110 L550,110 L680,170 L700,240 L750,260 L750,290 L680,290 A40,40 0 0,1 600,290 L200,290 A40,40 0 0,1 120,290 L50,290 L50,260 Z"
+                            class="car-path" />
+                        <!-- Roof/Window Lines -->
+                        <path d="M160,160 L240,120 L450,120 L550,170" class="car-path"
+                            style="stroke-dasharray: 5,5; stroke-width: 1px; fill: none;" />
+                        <!-- Wheels -->
+                        <circle cx="160" cy="290" r="45" style="fill:none; stroke:#475569; stroke-width:3;" />
+                        <circle cx="640" cy="290" r="45" style="fill:none; stroke:#475569; stroke-width:3;" />
+                        <!-- Hubcaps -->
+                        <circle cx="160" cy="290" r="15" style="fill:#1e293b; stroke:#0ea5e9; stroke-width:2;" />
+                        <circle cx="640" cy="290" r="15" style="fill:#1e293b; stroke:#0ea5e9; stroke-width:2;" />
+                    </svg>
+
+                    <!-- MARKERS (Positioned via % on the container) -->
+                    <!-- Engine -->
+                    <div id="pt-engine" class="part-marker" style="top: 55%; left: 23%;"></div>
+                    <div class="ar-label">ENGINE OVERHEAT</div>
+
+                    <!-- Radiator -->
+                    <div id="pt-rad" class="part-marker" style="top: 60%; left: 12%;"></div>
+                    <div class="ar-label">RADIATOR LEAK</div>
+
+                    <!-- Fuel -->
+                    <div id="pt-fuel" class="part-marker" style="top: 60%; left: 78%;"></div>
+                    <div class="ar-label">FUEL SYSTEM FAIL</div>
+
+                    <!-- Transmission -->
+                    <div id="pt-trans" class="part-marker" style="top: 70%; left: 45%;"></div>
+                    <div class="ar-label">TRANS SLIPPAGE</div>
+
+                    <!-- Exhaust -->
+                    <div id="pt-exh" class="part-marker" style="top: 85%; left: 55%;"></div>
+                    <div class="ar-label">CATALYST EFFICIENCY</div>
+                </div>
+
+                <!-- CHART OVERLAY (Bottom Right) -->
+                <div
+                    class="absolute bottom-4 right-4 w-64 h-32 glass-panel rounded-lg p-2 bg-slate-900/80 z-20 border border-slate-700">
                     <canvas id="miniChart"></canvas>
+                </div>
+
+                <!-- ALERT BANNER -->
+                <div id="live-alert-box" class="absolute top-4 right-4 z-30 hidden animate-bounce">
+                    <div
+                        class="bg-red-600 text-white px-6 py-3 rounded-lg shadow-[0_0_20px_rgba(239,68,68,0.6)] flex items-center gap-3 border border-red-400">
+                        <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                        <div>
+                            <div class="font-bold font-hud text-sm">CRITICAL WARNING</div>
+                            <div class="text-xs" id="live-alert-msg">Engine Temp Critical</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- PAGE 2: PREDICTIVE HEALTH REPORT (Unchanged) -->
-        <div id="page-health" class="hidden h-full max-w-5xl mx-auto flex-col gap-6 pt-4">
-            <div class="glass-panel rounded-2xl p-6 border-t-4 border-green-500 flex justify-between items-center"
-                id="health-header">
+        <!-- PAGE 2: HEALTH (Unchanged logic, style improved) -->
+        <div id="page-health" class="hidden h-full max-w-6xl mx-auto flex-col gap-6 overflow-y-auto pr-2">
+            <!-- Header -->
+            <div
+                class="glass-panel rounded-xl p-6 flex justify-between items-center border-l-4 border-green-500 bg-gradient-to-r from-green-900/20 to-transparent">
                 <div>
-                    <h2 class="font-hud text-xl font-bold text-white mb-1">Prognostic Report</h2>
-                    <p class="text-slate-400 text-xs">AI-driven RUL estimation (Remaining Useful Life).</p>
+                    <h2 class="font-hud text-2xl font-bold text-white">Maintenance Prognostics</h2>
+                    <p class="text-slate-400 text-sm mt-1">AI-based RUL predictions (Remaining Useful Life)</p>
                 </div>
-                <div class="text-right">
-                    <div class="font-hud text-4xl font-bold text-green-400" id="rul-score">98%</div>
-                    <div class="text-[10px] text-slate-500 uppercase tracking-widest">Health Score</div>
+                <div class="text-center">
+                    <div class="font-hud text-5xl font-bold text-green-400" id="rul-score">98%</div>
+                    <div class="text-[10px] uppercase tracking-[0.2em] text-slate-500">System Health</div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 flex-1 overflow-y-auto">
-                <!-- 1. Fuel -->
-                <div class="glass-panel rounded-xl p-4 hover:bg-slate-800/40 transition-colors">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-200 text-sm"><i
-                                class="fa-solid fa-gas-pump mr-2 text-blue-400"></i>Fuel System</span>
-                        <span class="text-green-400 font-hud text-xs" id="rul-fuel">6+ Months</span>
+            <!-- CARDS GRID -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- FUEL -->
+                <div class="glass-panel p-5 rounded-xl hover:translate-y-[-2px] transition-transform duration-300">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 text-xl">
+                            <i class="fa-solid fa-gas-pump"></i>
+                        </div>
+                        <span class="font-hud text-green-400 text-sm" id="rul-fuel">6+ Months</span>
                     </div>
-                    <div class="h-1 bg-slate-800 rounded-full overflow-hidden mb-1">
+                    <h3 class="font-bold text-slate-200">Fuel System</h3>
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full mt-3 mb-1 overflow-hidden">
                         <div class="h-full bg-green-500 w-[95%]" id="bar-fuel"></div>
                     </div>
-                    <p class="text-[10px] text-slate-500">Pressure stable at 3.5 Bar.</p>
+                    <p class="text-xs text-slate-500">Pressure stable (3.5 Bar)</p>
                 </div>
 
-                <!-- 2. Cooling -->
-                <div class="glass-panel rounded-xl p-4 hover:bg-slate-800/40 transition-colors">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-200 text-sm"><i
-                                class="fa-solid fa-temperature-full mr-2 text-orange-400"></i>Cooling</span>
-                        <span class="text-green-400 font-hud text-xs" id="rul-cool">6+ Months</span>
+                <!-- COOLING -->
+                <div class="glass-panel p-5 rounded-xl hover:translate-y-[-2px] transition-transform duration-300">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400 text-xl">
+                            <i class="fa-solid fa-temperature-full"></i>
+                        </div>
+                        <span class="font-hud text-green-400 text-sm" id="rul-cool">6+ Months</span>
                     </div>
-                    <div class="h-1 bg-slate-800 rounded-full overflow-hidden mb-1">
+                    <h3 class="font-bold text-slate-200">Cooling</h3>
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full mt-3 mb-1 overflow-hidden">
                         <div class="h-full bg-green-500 w-[92%]" id="bar-cool"></div>
                     </div>
-                    <p class="text-[10px] text-slate-500">Thermostat responsive.</p>
+                    <p class="text-xs text-slate-500">Thermostat responsive</p>
                 </div>
 
-                <!-- 3. Engine -->
-                <div class="glass-panel rounded-xl p-4 hover:bg-slate-800/40 transition-colors">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-200 text-sm"><i
-                                class="fa-solid fa-gears mr-2 text-purple-400"></i>Engine</span>
-                        <span class="text-green-400 font-hud text-xs" id="rul-eng">6+ Months</span>
+                <!-- ENGINE -->
+                <div class="glass-panel p-5 rounded-xl hover:translate-y-[-2px] transition-transform duration-300">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 text-xl">
+                            <i class="fa-solid fa-gears"></i>
+                        </div>
+                        <span class="font-hud text-green-400 text-sm" id="rul-eng">6+ Months</span>
                     </div>
-                    <div class="h-1 bg-slate-800 rounded-full overflow-hidden mb-1">
+                    <h3 class="font-bold text-slate-200">Engine Block</h3>
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full mt-3 mb-1 overflow-hidden">
                         <div class="h-full bg-green-500 w-[98%]" id="bar-eng"></div>
                     </div>
-                    <p class="text-[10px] text-slate-500">Vibration nominal.</p>
+                    <p class="text-xs text-slate-500">Vibration nominal</p>
                 </div>
 
-                <!-- 4. Catalyst -->
-                <div class="glass-panel rounded-xl p-4 hover:bg-slate-800/40 transition-colors">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-200 text-sm"><i
-                                class="fa-solid fa-smog mr-2 text-slate-400"></i>Catalyst</span>
-                        <span class="text-yellow-400 font-hud text-xs" id="rul-cat">4 Months</span>
+                <!-- CATALYST -->
+                <div class="glass-panel p-5 rounded-xl hover:translate-y-[-2px] transition-transform duration-300">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-slate-500/10 flex items-center justify-center text-slate-400 text-xl">
+                            <i class="fa-solid fa-smog"></i>
+                        </div>
+                        <span class="font-hud text-yellow-500 text-sm" id="rul-cat">4 Months</span>
                     </div>
-                    <div class="h-1 bg-slate-800 rounded-full overflow-hidden mb-1">
+                    <h3 class="font-bold text-slate-200">Catalyst</h3>
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full mt-3 mb-1 overflow-hidden">
                         <div class="h-full bg-yellow-500 w-[75%]" id="bar-cat"></div>
                     </div>
-                    <p class="text-[10px] text-slate-500">Efficiency slightly reduced.</p>
+                    <p class="text-xs text-slate-500">Efficiency 85%</p>
                 </div>
+            </div>
+
+            <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-800 text-center text-sm text-slate-500">
+                <i class="fa-solid fa-shield-halved mr-2 text-cyan-500"></i>
+                Data verified by <strong>FEDXAI-Edge v4.2</strong>. Next scan scheduled automatically.
             </div>
         </div>
     </div>
 
+    <!-- SCRIPTS -->
     <script>
-        // --- PAGE NAV ---
-        function showPage(pageId) {
+        // --- PAGE SWITCHING ---
+        function showPage(id) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`nav-${pageId}`).classList.add('active');
+            document.getElementById(`nav-${id}`).classList.add('active');
+
             document.getElementById('page-live').classList.add('hidden');
             document.getElementById('page-health').classList.add('hidden');
 
-            if (pageId === 'live') {
+            if (id === 'live') {
                 document.getElementById('page-live').classList.remove('hidden');
                 document.getElementById('page-live').classList.add('grid');
             } else {
@@ -354,15 +422,15 @@
             }
         }
 
-        // --- CHART ---
+        // --- CHART SETUP ---
         const ctx = document.getElementById('miniChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: Array(15).fill(''),
+                labels: Array(20).fill(''),
                 datasets: [
-                    { label: 'RPM', data: Array(15).fill(0), borderColor: '#22d3ee', borderWidth: 1.5, tension: 0.4, pointRadius: 0 },
-                    { label: 'Temp', data: Array(15).fill(0), borderColor: '#f97316', borderWidth: 1.5, tension: 0.4, pointRadius: 0 }
+                    { label: 'RPM', data: Array(20).fill(0), borderColor: '#22d3ee', borderWidth: 2, tension: 0.4, pointRadius: 0 },
+                    { label: 'Temp', data: Array(20).fill(0), borderColor: '#f97316', borderWidth: 2, tension: 0.4, pointRadius: 0 }
                 ]
             },
             options: {
@@ -373,15 +441,18 @@
             }
         });
 
-        // --- STATE & UI ---
-        let simInterval;
-
+        // --- UI UPDATERS ---
         function updateLiveUI(data) {
-            document.getElementById('val-rpm').innerText = (data.rpm / 1000).toFixed(1); // x1000 format
-            document.getElementById('val-ct').innerText = data.ct.toFixed(0) + '°';
+            // Update Text
+            document.getElementById('val-rpm').innerText = data.rpm.toFixed(0);
+            document.getElementById('val-ct').innerText = data.ct.toFixed(1) + '°';
             document.getElementById('val-fp').innerText = data.fp.toFixed(1);
-            document.getElementById('bar-rpm').style.width = Math.min(100, (data.rpm / 80)) + '%';
 
+            // Bar Width
+            const rpmPct = Math.min(100, (data.rpm / 80));
+            document.getElementById('bar-rpm').style.width = rpmPct + '%';
+
+            // Chart Push
             chart.data.datasets[0].data.push(data.rpm / 80);
             chart.data.datasets[1].data.push(data.ct);
             chart.data.datasets.forEach(ds => ds.data.shift());
@@ -389,33 +460,39 @@
         }
 
         function triggerAlert(componentId, msg, isCritical) {
+            // Reset
             document.querySelectorAll('.part-critical').forEach(el => el.classList.remove('part-critical'));
             document.getElementById('live-alert-box').classList.add('hidden');
 
             const probEl = document.getElementById('val-prob');
+
             if (isCritical) {
-                probEl.innerText = (85 + Math.random() * 5).toFixed(0) + '%';
-                probEl.className = "font-hud text-xl font-bold text-red-500 animate-pulse";
+                // FAILURE MODE
+                const prob = (85 + Math.random() * 10).toFixed(1);
+                probEl.innerText = prob + '%';
+                probEl.className = "font-hud text-3xl font-bold text-red-500 my-1 animate-pulse";
 
-                if (componentId) document.getElementById(componentId).classList.add('part-critical');
-
+                // Show Alert Banner
                 document.getElementById('live-alert-box').classList.remove('hidden');
                 document.getElementById('live-alert-msg').innerText = msg;
 
-                // Health Page Update
-                document.getElementById('health-header').classList.replace('border-green-500', 'border-red-500');
+                // Highlight Map Marker
+                if (componentId) document.getElementById(componentId).classList.add('part-critical');
+
+                // Health Page Impact
                 document.getElementById('rul-score').innerText = "CRITICAL";
-                document.getElementById('rul-score').classList.replace('text-green-400', 'text-red-500');
+                document.getElementById('rul-score').className = "font-hud text-5xl font-bold text-red-500 animate-pulse";
                 if (componentId === 'pt-fuel') updateHealthBar('fuel', 'IMMEDIATE', '5%', 'bg-red-500');
-                if (componentId === 'pt-rad') updateHealthBar('cool', '1 Week', '15%', 'bg-red-500');
+                if (componentId === 'pt-rad') updateHealthBar('cool', '1 Week', '10%', 'bg-red-500');
 
             } else {
-                probEl.innerText = (2 + Math.random() * 3).toFixed(0) + '%';
-                probEl.className = "font-hud text-xl font-bold text-green-500";
+                // NORMAL MODE
+                probEl.innerText = (Math.random() * 5).toFixed(1) + '%';
+                probEl.className = "font-hud text-3xl font-bold text-green-500 my-1";
 
-                document.getElementById('health-header').classList.replace('border-red-500', 'border-green-500');
+                // Reset Health
                 document.getElementById('rul-score').innerText = "98%";
-                document.getElementById('rul-score').classList.replace('text-red-500', 'text-green-400');
+                document.getElementById('rul-score').className = "font-hud text-5xl font-bold text-green-400";
                 updateHealthBar('fuel', '6+ Months', '95%', 'bg-green-500');
                 updateHealthBar('cool', '6+ Months', '92%', 'bg-green-500');
             }
@@ -423,36 +500,43 @@
 
         function updateHealthBar(id, text, width, colorClass) {
             document.getElementById(`rul-${id}`).innerText = text;
-            document.getElementById(`rul-${id}`).className = `font-hud text-xs ${colorClass.replace('bg-', 'text-')}`;
-            document.getElementById(`bar-${id}`).className = `h-full w-full transition-all duration-1000 ${colorClass}`;
-            document.getElementById(`bar-${id}`).style.width = width;
+            const bar = document.getElementById(`bar-${id}`);
+            bar.className = `h-full w-full transition-all duration-1000 ${colorClass}`;
+            bar.style.width = width;
+
+            // Text Color
+            const txt = document.getElementById(`rul-${id}`);
+            txt.className = `font-hud text-sm ${colorClass.replace('bg-', 'text-')}`;
         }
 
-        // --- DEMO MODE ---
+        // --- SIMULATION ---
+        let simInterval;
         function startSimulation() {
             if (simInterval) clearInterval(simInterval);
             let t = 0;
             simInterval = setInterval(() => {
                 t += 0.1;
-                const rpm = 3000 + Math.sin(t) * 1200 + (Math.random() * 100);
+                // Generate Data
+                const rpm = 3000 + Math.sin(t) * 1000 + Math.random() * 200;
                 const ct = 90 + Math.sin(t * 0.5) * 5;
                 const fp = 3.5 + Math.cos(t) * 0.2;
                 updateLiveUI({ rpm, ct, fp });
 
-                const cycle = Math.floor(t) % 25;
-                if (cycle > 18 && cycle < 22) {
-                    triggerAlert('pt-fuel', "FUEL PUMP EFFICIENCY LOW", true);
-                    updateLiveUI({ rpm: rpm * 0.8, ct: ct, fp: 1.8 });
-                } else if (cycle > 22) {
-                    triggerAlert('pt-rad', "COOLANT TEMP CRITICAL", true);
-                    updateLiveUI({ rpm: rpm, ct: 112, fp: fp });
+                // Failures
+                const cycle = Math.floor(t) % 20;
+                if (cycle > 15 && cycle < 18) {
+                    triggerAlert('pt-fuel', "Fuel Pressure Critical (<1.5 Bar)", true);
+                    updateLiveUI({ rpm: rpm * 0.9, ct: ct, fp: 1.2 });
+                } else if (cycle > 18) {
+                    triggerAlert('pt-rad', "Coolant Overheat (>110°C)", true);
+                    updateLiveUI({ rpm: rpm, ct: 115, fp: fp });
                 } else {
                     triggerAlert(null, "System OK", false);
                 }
-            }, 500);
+            }, 600);
         }
 
-        // --- BLE LOGIC ---
+        // --- BLE CONNECT ---
         const SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
         const CHAR_PROB_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a9';
         const CHAR_ALERT_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26aa';
@@ -461,7 +545,7 @@
         async function connectBLE() {
             clearInterval(simInterval);
             try {
-                if (!navigator.bluetooth) throw new Error("Web Bluetooth API unavailable.");
+                if (!navigator.bluetooth) throw new Error("Web Bluetooth unavailable.");
                 const device = await navigator.bluetooth.requestDevice({ filters: [{ name: 'FedXAI-Dongle' }], optionalServices: [SERVICE_UUID] });
                 const server = await device.gatt.connect();
                 const service = await server.getPrimaryService(SERVICE_UUID);
@@ -469,14 +553,6 @@
                 const charSens = await service.getCharacteristic(CHAR_SENSORS_UUID);
                 await charSens.startNotifications();
                 charSens.addEventListener('characteristicvaluechanged', e => updateLiveUI(JSON.parse(new TextDecoder().decode(e.target.value))));
-
-                const charProb = await service.getCharacteristic(CHAR_PROB_UUID);
-                await charProb.startNotifications();
-                charProb.addEventListener('characteristicvaluechanged', e => {
-                    const prob = e.target.value.getFloat32(0, true);
-                    if (prob > 0.5) triggerAlert('pt-engine', "Anomaly Detected", true);
-                    else triggerAlert(null, "System OK", false);
-                });
 
                 const charAlert = await service.getCharacteristic(CHAR_ALERT_UUID);
                 await charAlert.startNotifications();
@@ -487,9 +563,10 @@
                     else triggerAlert(null, msg, false);
                 });
 
-                document.getElementById('btn-conn').innerText = "CONNECTED";
-                document.getElementById('btn-conn').classList.replace("bg-blue-600", "bg-green-600");
-            } catch (e) { alert("Connection Failed: " + e); }
+                document.getElementById('btn-conn').innerText = "LINKED";
+                document.getElementById('btn-conn').className = "bg-green-600 px-3 py-1 rounded text-[10px] font-bold shadow-lg";
+
+            } catch (e) { alert(e); }
         }
     </script>
 </body>
