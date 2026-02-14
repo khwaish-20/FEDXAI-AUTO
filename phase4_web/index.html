@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FEDXAI V3 Hyper-Cockpit</title>
+    <title>FEDXAI V4 Ultimate Cockpit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -41,13 +41,19 @@
         /* Car Part Markers */
         .part-marker {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 14px;
+            height: 14px;
             background: #334155;
             border: 2px solid #94a3b8;
             border-radius: 50%;
             cursor: pointer;
             z-index: 10;
+            transition: all 0.3s;
+        }
+
+        .part-marker:hover {
+            transform: scale(1.2);
+            border-color: #fff;
         }
 
         .part-critical {
@@ -110,13 +116,21 @@
         /* SVG Styling */
         .car-path {
             fill: none;
-            stroke: #475569;
+            stroke: #38bdf8;
             stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.5));
         }
 
         .car-fill {
-            fill: #1e293b;
-            opacity: 0.3;
+            fill: rgba(30, 41, 59, 0.3);
+        }
+
+        .wheel {
+            fill: none;
+            stroke: #94a3b8;
+            stroke-width: 2;
         }
     </style>
 </head>
@@ -160,49 +174,54 @@
         <!-- PAGE 1: LIVE COCKPIT (80/20 Split) -->
         <div id="page-live" class="h-full grid grid-cols-12 gap-4 transition-all duration-300">
 
-            <!-- LEFT: 3D CAR VISUALIZER (83% Width) -->
+            <!-- LEFT: CAR VISUALIZER (83% Width) -->
             <div
                 class="col-span-10 glass-panel rounded-xl relative flex items-center justify-center bg-gradient-to-b from-slate-900/40 to-transparent overflow-hidden">
                 <div class="absolute top-3 left-3 font-hud text-[10px] text-slate-500 tracking-widest">VEHICLE STATUS
                     MONITOR // ACTIVE</div>
 
-                <!-- SVG CAR (INLINED) -->
-                <div class="relative w-[90%] h-[80%] flex items-center justify-center">
-                    <svg viewBox="0 0 800 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(56,189,248,0.1)]">
-                        <!-- Car Body Outline -->
-                        <path d="M100,200 L120,150 L250,130 L350,80 L550,80 L680,140 L700,200 Z" class="car-fill" />
+                <!-- SVG CAR (High Visibility) -->
+                <div class="relative w-[85%] h-full flex items-center justify-center">
+                    <svg viewBox="0 0 600 250" class="w-full h-auto drop-shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+                        <!-- Detailed Sedan Outline -->
                         <path
-                            d="M50,220 L100,200 L120,150 L250,130 L350,80 L550,80 L680,140 L700,200 L750,220 L750,250 L680,250 A40,40 0 0,1 600,250 L200,250 A40,40 0 0,1 120,250 L50,250 Z"
-                            class="car-path" />
-                        <circle cx="160" cy="250" r="35" class="car-path" />
-                        <circle cx="640" cy="250" r="35" class="car-path" />
+                            d="M50,150 Q50,130 70,125 L150,110 L220,60 L400,60 L500,115 L560,125 Q580,130 580,150 L580,190 L530,190 A40,40 0 0,1 450,190 L180,190 A40,40 0 0,1 100,190 L50,190 Z"
+                            class="car-path" fill="rgba(15,23,42,0.5)" />
+
+                        <!-- Wheels -->
+                        <circle cx="140" cy="190" r="35" class="wheel" />
+                        <circle cx="490" cy="190" r="35" class="wheel" />
+
+                        <!-- Window Line -->
+                        <path d="M160,110 L230,70 L390,70 L490,115" class="car-path"
+                            style="stroke-width:1; opacity:0.6" />
                     </svg>
 
-                    <!-- COMPONENT MARKERS (Absolute Positioned on SVG Grid) -->
+                    <!-- COMPONENT MARKERS (Absolute Positioned on Container) -->
                     <!-- Engine (Front) -->
-                    <div id="pt-engine" class="part-marker" style="top: 55%; left: 25%;"></div>
+                    <div id="pt-engine" class="part-marker" style="top: 50%; left: 25%;"></div>
                     <div class="ar-label">ENGINE OVERHEAT</div>
 
                     <!-- Radiator (Front Nose) -->
-                    <div id="pt-rad" class="part-marker" style="top: 58%; left: 15%;"></div>
+                    <div id="pt-rad" class="part-marker" style="top: 55%; left: 12%;"></div>
                     <div class="ar-label">COOLANT LEAK</div>
 
                     <!-- Transmission (Center) -->
-                    <div id="pt-trans" class="part-marker" style="top: 65%; left: 40%;"></div>
+                    <div id="pt-trans" class="part-marker" style="top: 65%; left: 45%;"></div>
                     <div class="ar-label">GEAR SLIPPAGE</div>
 
                     <!-- Fuel Tank (Rear) -->
-                    <div id="pt-fuel" class="part-marker" style="top: 60%; left: 75%;"></div>
+                    <div id="pt-fuel" class="part-marker" style="top: 55%; left: 80%;"></div>
                     <div class="ar-label">FUEL PUMP FAILURE</div>
 
-                    <!-- Catalyst (Bottom Center) -->
+                    <!-- Catalyst (Under Center) -->
                     <div id="pt-exh" class="part-marker" style="top: 75%; left: 50%;"></div>
                     <div class="ar-label">CATALYST EFFICIENCY</div>
                 </div>
 
                 <!-- ALERTS OVERLAY (Compact Bottom) -->
                 <div id="live-alert-box"
-                    class="absolute bottom-4 left-1/2 -translate-x-1/2 glass-panel border border-red-500/50 p-2 px-6 rounded-full bg-red-950/80 hidden flex items-center gap-3">
+                    class="absolute bottom-6 left-1/2 -translate-x-1/2 glass-panel border border-red-500/50 p-2 px-6 rounded-full bg-red-950/80 hidden flex items-center gap-3">
                     <i class="fa-solid fa-triangle-exclamation text-red-500 animate-pulse"></i>
                     <span class="font-hud text-red-400 font-bold text-sm" id="live-alert-msg">CRITICAL FAILURE
                         DETECTED</span>
