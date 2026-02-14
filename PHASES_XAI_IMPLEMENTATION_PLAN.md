@@ -217,13 +217,14 @@
 | **Local Alert Gen** | SHAP-based translation: sensor contributions → human-readable diagnosis |
 | **Mobile App** | Receives alerts via Bluetooth/WiFi → displays: `"Check Fuel Filter"`, `"Coolant System Warning"` |
 
-### Step 4.4: Mobile App Interface
+### Step 4.4: Web Dashboard Interface (PWA)
 | Item | Detail |
 |------|--------|
-| **Platform** | Android (Flutter or React Native) |
-| **Features** | Real-time health dashboard, push notifications for failures, maintenance history log |
-| **Communication** | BLE (Bluetooth Low Energy) from dongle to phone |
-| **Status** | 🔲 PENDING (requires Flutter/React Native setup) |
+| **Type** | Progressive Web App (PWA) — Zero install, runs in Chrome/Edge |
+| **Tech Stack** | HTML5, TailwindCSS (CDN), Chart.js (CDN), Web Bluetooth API |
+| **Features** | Real-time sensor gauges, XAI Alert Overlay, Connection Status |
+| **Communication** | Direct Bluetooth Low Energy (BLE) via Browser |
+| **Status** | � IN PROGRESS (Initializing single-file dashboard) |
 
 ### Phase 4 Output
 | Item | Detail |
@@ -271,7 +272,7 @@
 | **Phase 1** | Foundation & Baseline Validation | ✅ COMPLETE |
 | **Phase 2** | Digital Twin & Data Factory | ✅ COMPLETE |
 | **Phase 3** | Advanced FedXAI Framework | ✅ COMPLETE |
-| **Phase 4** | Indian Solution (Edge Deployment) | 🟡 IN PROGRESS (4.1 ✅, 4.2 ✅, 4.3 🔲, 4.4 🔲) |
+| **Phase 4** | Indian Solution (Edge Deployment) | 🟡 IN PROGRESS (4.1 ✅, 4.2 ✅, 4.3 🔲, 4.4 �) |
 
 ---
 
@@ -286,4 +287,4 @@
 | **Model Compression** | TensorFlow Lite (INT8 Quantization) |
 | **Edge Inference** | TensorFlow Lite Micro |
 | **Hardware** | ESP32-S3 / RISC-V SoC + ELM327 OBD-II |
-| **Mobile App** | Flutter / React Native (BLE communication) |
+| **Web Dashboard** | HTML5 / React (Web Bluetooth API) |

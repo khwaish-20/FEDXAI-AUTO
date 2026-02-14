@@ -38,7 +38,7 @@ FEDXAI-AUTO addresses the challenge of building accurate predictive maintenance 
 ```
 ┌─────────────┐    ┌──────────────┐    ┌─────────────────┐    ┌────────────┐
 │  Vehicle ECU │───▶│  ELM327 OBD  │───▶│  ESP32-S3 MCU   │───▶│ Mobile App │
-│  (8 sensors) │    │  (UART/BLE)  │    │  TFLite Micro   │    │ (BLE)      │
+│  (8 sensors) │    │  (UART/BLE)  │    │  TFLite Micro   │    │ (Web/Chrome)│
 │              │    │              │    │  22.6KB model    │    │ Dashboard  │
 │  RPM, Temp,  │    │  PID Reader  │    │  98.64% Acc     │    │ XAI Alerts │
 │  Load, etc.  │    │              │    │  <100ms infer    │    │            │
@@ -198,7 +198,7 @@ pio run --target upload
 ## 🔮 Future Work
 
 - [ ] Collect real OBD-II data from Indian vehicles for validation
-- [ ] Build Flutter mobile app with BLE dashboard
+- [ ] Enhace Web Dashboard with cloud sync
 - [ ] Add over-the-air (OTA) model updates via WiFi
 - [ ] Expand to heavy commercial vehicles (trucks, buses)
 - [ ] Multi-fault classification (currently binary: healthy/failure)
