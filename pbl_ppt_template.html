@@ -232,11 +232,30 @@
         let sec = 0;
         let timer = null;
         function startTimer() {
+            if (timer) clearInterval(timer);
+            sec = 0;
+            const timerContainer = document.getElementById('timerContainer');
+            const timerIcon = document.getElementById('timerIcon');
+            const displayTime = document.getElementById('displayTime');
+
             timer = setInterval(() => {
                 sec++;
                 let m = Math.floor(sec / 60);
                 let s = sec % 60;
-                document.getElementById('displayTime').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                displayTime.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+                // Warning at 8 mins (480s)
+                if (sec >= 480 && sec < 600) {
+                    timerContainer.classList.add('timer-warning');
+                    timerIcon.classList.replace('fa-hourglass-start', 'fa-hourglass-half');
+                }
+                // Stop at 10 mins (600s)
+                else if (sec >= 600) {
+                    clearInterval(timer);
+                    timerContainer.classList.replace('timer-warning', 'timer-stop');
+                    displayTime.innerText = "10:00";
+                    timerIcon.classList.replace('fa-hourglass-half', 'fa-hourglass-end');
+                }
             }, 1000);
         }
 
