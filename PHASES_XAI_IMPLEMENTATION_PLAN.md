@@ -224,7 +224,7 @@
 | **Tech Stack** | HTML5, TailwindCSS (CDN), Chart.js (CDN), Web Bluetooth API |
 | **Features** | Real-time sensor gauges, XAI Alert Overlay, Connection Status |
 | **Communication** | Direct Bluetooth Low Energy (BLE) via Browser |
-| **Status** | � IN PROGRESS (Initializing single-file dashboard) |
+| **Status** |  IN PROGRESS (Initializing single-file dashboard) |
 
 ### Phase 4 Output
 | Item | Detail |
@@ -272,7 +272,7 @@
 | **Phase 1** | Foundation & Baseline Validation | ✅ COMPLETE |
 | **Phase 2** | Digital Twin & Data Factory | ✅ COMPLETE |
 | **Phase 3** | Advanced FedXAI Framework | ✅ COMPLETE |
-| **Phase 4** | Indian Solution (Edge Deployment) | 🟡 IN PROGRESS (4.1 ✅, 4.2 ✅, 4.3 🔲, 4.4 �) |
+| **Phase 4** | Indian Solution (Edge Deployment) | 🟡 IN PROGRESS (4.1 ✅, 4.2 ✅, 4.3 🔲, 4.4 ) |
 
 ---
 
