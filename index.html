@@ -111,8 +111,9 @@
             </p>
         </section>
 
-        <section id="problem" class="grid md:grid-cols-2 gap-12 items-stretch">
-            <div class="glass p-10 rounded-[2.5rem] flex flex-col justify-center border-l-4 border-blue-600">
+<section id="problem" class="space-y-12">
+            <!-- 1. Problem Statement (Top) -->
+            <div class="glass p-10 rounded-[2.5rem] border-l-4 border-blue-600">
                 <h2 class="text-3xl font-extrabold mb-6">Problem Statement</h2>
                 <p class="text-slate-400 leading-relaxed text-justify">The automotive industry is shifting towards
                     proactive Predictive Maintenance (PdM), particularly to handle new challenges like accelerated part
@@ -121,29 +122,36 @@
                     privacy, and (2) The 'Black Box' nature of AI, which gives drivers opaque warnings without
                     explaining why a part is failing, destroying user trust.</p>
             </div>
-            <div class="space-y-6">
-                <div class="glass p-7 rounded-3xl border-r-4 border-blue-500/50">
-                    <h3 class="text-blue-400 font-bold text-xs uppercase tracking-widest mb-2">Literature Review /
-                        Market Research</h3>
-                    <p class="text-sm text-slate-500 italic text-justify">Current PdM systems face two major roadblocks.
-                        First, traditional methods rely on centralized data sharing, which violates data confidentiality
-                        and security regulations. Second, these AI models suffer from a lack of interpretability; they
-                        act as opaque "black boxes," making it difficult for operators to trust their failure
-                        predictions. Recent 2025 research successfully applied Explainable Federated Learning (XFL) to
-                        static factory machines, FedXAI-Auto bridges the gap to the dynamic automotive sector.</p>
+
+            <!-- 2. Literature Review (Middle - Full Width Horizontal) -->
+            <div class="glass p-10 rounded-[2.5rem] border-l-4 border-blue-500/50">
+                <h3 class="text-blue-400 font-bold text-xs uppercase tracking-widest mb-6">Literature Review / Market Research</h3>
+                <div class="space-y-6 text-sm text-slate-400 text-justify">
+                    <p><strong>1) The Shift to Data-Driven PdM:</strong> The automotive sector is increasingly using sensor data and AI to transition from reactive repairs to proactive Predictive Maintenance (PdM) [1]</p>
+                    <p><strong>2) Technical Roadblocks:</strong> Real-world deployment is hindered by noisy industrial environments, the need to process high volumes of data quickly, and models that fail to scale globally.</p>
+                    <p><strong>3) The Privacy & Trust Bottleneck:</strong> Traditional predictive models require centralized data sharing (raising major privacy and regulatory concerns) and act as opaque "black boxes," making it difficult for operators to trust the AI's predictions. [2]</p>
+                    <p><strong>4) The State-of-the-Art Solution:</strong> Recent advancements propose Explainable Federated Learning (XFL). This framework uses Federated Learning to train models securely at the edge without sharing sensitive data, and integrates Explainable AI (SHAP/LIME) to provide transparent, trustworthy insights—achieving up to 98.15% accuracy. [3]</p>
                 </div>
-                <div class="glass p-7 rounded-3xl border-r-4 border-purple-500/50">
-                    <h3 class="text-purple-400 font-bold text-xs uppercase tracking-widest mb-2">Research Gap /
-                        Innovation</h3>
-                    <p class="text-sm text-slate-500 italic text-justify">A recent 2025 study successfully developed a
-                        privacy-preserving Explainable FL (XFL) model for sustainable manufacturing, achieving an
-                        impressive 98.15% accuracy in a factory setting. In FEDXAI-AUTO, we innovate by deploying a
-                        lightweight, decentralized Temporal Model (CNN+LSTM) onto an ESP32 edge device, ensuring zero
-                        raw-data leakage while using XAI to translate complex E20 degradation signatures into
-                        human-readable alerts for drivers.</p>
+                
+                <!-- References -->
+                <div class="mt-8 pt-6 border-t border-white/10 text-[10px] text-slate-600 italic space-y-2">
+                    <p class="font-bold uppercase tracking-widest mb-2 not-italic text-slate-500">References</p>
+                    <p>[1] Arena, F., et al. (2022). "Predictive Maintenance in the Automotive Sector: A Literature Review." Mathematical and Computational Applications.</p>
+                    <p>[2] Nunes, P., Santos, J., & Rocha, E. (2023). "Challenges in predictive maintenance – A review." CIRP Journal of Manufacturing Science and Technology.</p>
+                    <p>[3] Alshkeili, H.M.H.A., Almheiri, S.J., & Khan, M.A. (2025). "Privacy-Preserving Interpretability: An Explainable Federated Learning Model for Predictive Maintenance in Sustainable Manufacturing and Industry 4.0." AI2025.</p>
                 </div>
             </div>
 
+            <!-- 3. Research Gap (Bottom - Full Width Horizontal) -->
+            <div class="glass p-10 rounded-[2.5rem] border-l-4 border-purple-500/50">
+                <h3 class="text-purple-400 font-bold text-xs uppercase tracking-widest mb-4">Research Gap / Innovation</h3>
+                <p class="text-sm text-slate-400 leading-relaxed text-justify">A recent 2025 study successfully developed a
+                    privacy-preserving Explainable FL (XFL) model for sustainable manufacturing, achieving an
+                    impressive 98.15% accuracy in a factory setting. In FEDXAI-AUTO, we innovate by deploying a
+                    lightweight, decentralized Temporal Model (CNN+LSTM) onto an ESP32 edge device, ensuring zero
+                    raw-data leakage while using XAI to translate complex E20 degradation signatures into
+                    human-readable alerts for drivers.</p>
+            </div>
         </section>
 
         <section id="methodology" class="space-y-12">

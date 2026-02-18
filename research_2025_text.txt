@@ -1,0 +1,1430 @@
+Academic Editor:
+Mohammad Valipour
+Received: 19 March 2025
+Revised: 21 May 2025
+Accepted: 4 June 2025
+Published: 6 June 2025
+Citation: Alshkeili, H.M.H.A.;
+Almheiri, S.J.; Khan, M.A.
+Privacy-Preserving Interpretability:
+An Explainable Federated Learning
+Model for Predictive Maintenance in
+Sustainable Manufacturing and
+Industry 4.0. AI 2025, 6, 117.
+https://doi.org/10.3390/ai6060117
+Copyright: © 2025 by the authors.
+Licensee MDPI, Basel, Switzerland.
+This article is an open access article
+distributed under the terms and
+conditions of the Creative Commons
+Attribution (CC BY) license
+(https://creativecommons.org/
+licenses/by/4.0/).
+AI
+Article
+Privacy-Preserving Interpretability: An Explainable Federated
+Learning Model for Predictive Maintenance in Sustainable
+Manufacturing and Industry 4.0
+Hamad Mohamed Hamdan Alzari Alshkeili 1, Saif Jasim Almheiri 1 and Muhammad Adnan Khan 1,2,3,4,5,*
+1
+School of Computing, Skyline University College, University City Sharjah, Sharjah 1797, United Arab Emirates;
+hamadalzari@hotmail.com (H.M.H.A.A.); saif.jasim@shjmun.gov.ae (S.J.A.)
+2
+Riphah School of Computing & Innovation, Faculty of Computing, Riphah International University,
+Lahore Campus, Lahore 54000, Pakistan
+3
+Chitkara University Institute of Engineering and Technology, Chitkara University, Rajpura 140401, Punjab, India
+4
+Department of Software, Faculty of Artificial Intelligence and Software, Gachon University,
+Seongnam-si 13120, Republic of Korea
+5
+Applied Science Research Center, Applied Science Private University, Amman 11931, Jordan
+*
+Correspondence: adnan@gachon.ac.kr
+Abstract: Background: Industry 4.0’s development requires digitalized manufacturing
+through Predictive Maintenance (PdM) because such practices decrease equipment failures
+and operational disruptions. However, its effectiveness is hindered by three key challenges:
+(1) data confidentiality, as traditional methods rely on centralized data sharing, raising con-
+cerns about security and regulatory compliance; (2) a lack of interpretability, where opaque
+AI models provide limited transparency, making it difficult for operators to trust and act
+on failure predictions; and (3) adaptability issues, as many existing solutions struggle to
+maintain a consistent performance across diverse industrial environments. Addressing
+these challenges requires a privacy-preserving, interpretable, and adaptive Artificial In-
+telligence (AI) model that ensures secure, reliable, and transparent PdM while meeting
+industry standards and regulatory requirements. Methods: Explainable AI (XAI) plays a
+crucial role in enhancing transparency and trust in PdM models by providing interpretable
+insights into failure predictions. Meanwhile, Federated Learning (FL) ensures privacy-
+preserving, decentralized model training, allowing multiple industrial sites to collaborate
+without sharing sensitive operational data. This proposed research developed a sustainable
+privacy-preserving Explainable FL (XFL) model that integrates XAI techniques like Shap-
+ley Additive Explanations (SHAP) and Local Interpretable Model-Agnostic Explanations
+(LIME) into an FL structure to improve PdM’s security and interpretability capabilities.
+Results: The proposed XFL model enables industrial operators to interpret, validate, and
+refine AI-driven maintenance strategies while ensuring data privacy, accuracy, and reg-
+ulatory compliance. Conclusions: This model significantly improves failure prediction,
+reduces unplanned downtime, and strengthens trust in AI-driven decision-making. The
+simulation results confirm its high reliability, achieving 98.15% accuracy with a minimal
+1.85% miss rate, demonstrating its effectiveness as a scalable, secure, and interpretable
+solution for PdM in Industry 4.0.
+Keywords: predictive maintenance (PdM); artificial intelligence (AI); explainable AI (XAI);
+federated learning (FL); explainable FL (XFL); Shapley additive explanations (SHAP); local
+interpretable model-agnostic explanations (LIME); industry 4.0
+AI 2025, 6, 117
+https://doi.org/10.3390/ai6060117
+AI 2025, 6, 117
+2 of 24
+1. Introduction
+The revolution of Industry 4.0 combines digital technologies to connect physical sys-
+tems with electronic manufacturing operations for production. Smart production is the
+central principle of this revolution, which connects Cyber-Physical Systems (CPSs) to In-
+ternet of Things (IoT) technologies to maintain instant data processing and operational
+improvement [1,2]. Organizations need to unify technology with strategic management,
+along with human resource development initiatives, to build systems with better pro-
+duction efficiency, the optimal resource management structures, and higher competitive
+advantages. An effective combination of the components involved creates solutions for
+both competition-related challenges and market demands [3]. Major advancements in
+manufacturing occur during Industry 4.0 because this stage uses connected technologies
+with automated systems and advanced analytical capabilities. Advanced manufacturing
+environments make their appearance through the integration of IoT technology with big
+data analytics and AI and CPS approaches [4,5]. Maintenance operations under Industry 4.0
+deliver substantial effects on productivity, along with enhanced safety performance and
+cost management [6]. PdM’s implementation leads to operational enhancements because it
+reduces maintenance expenses and minimizes equipment downtime [7,8].
+Figure 1 establishes a classification for maintenance strategies through four reliability-
+based Overall Equipment Effectiveness (OEE)-centered levels. Reactive Maintenance reacts
+to failures through repairs after they happen, which causes equipment stoppages and
+expensive repair costs. Planned maintenance uses scheduled servicing for the prevention of
+failures while not addressing unpredictable situations. Proactive maintenance helps reduce
+defects before equipment failures through proactive measures to enhance reliability. PdM
+operates at the highest level through real-time sensor analytics and AI-driven capabilities,
+which allow companies to foresee equipment failures and maximize their operational
+efficiency across Industry 4.0 fields [9].
+ 
+Figure 1. Maintenance strategies [9].
+PdM by the manufacturing, automotive, and aviation industries continues to increase
+because it helps anticipate equipment breakdowns through real-time data to the create op-
+timal maintenance planning. This proactive method helps decrease unplanned equipment
+stoppages while boosting operating effectiveness and device dependability levels [10,11].
+PdM optimizes efficiency by leveraging IoT sensor data and advanced analytics to antici-
+pate failures, enabling proactive interventions that minimize downtimes, reduce costs, and
+enhance safety [12,13].
+The PdM process is visually represented in Figure 2, which includes IoT and AI,
+along with automation, for the optimization of industrial efficiency. Sensors installed
+on connected machines allow for remote monitoring through real-time data collection
+to manage persistent equipment health check-ups. Predictive analyses employ Machine
+Learning (ML) models to forecast failures, which generate proactive maintenance alerts
+AI 2025, 6, 117
+3 of 24
+for scheduled interventions. Automated maintenance improves workplace operations by
+producing maintenance requests, followed by repair scheduling together with technician
+allocation, to maintain smooth, continuous production under Industry 4.0 [14].
+ 
+Figure 2. PdM process using the IoT, ML, and automation [14].
+The traditional PdM methods encounter multiple substantial barriers even after ex-
+periencing important advancements. Hotspot identity and database centralization in the
+conventional approaches create substantial risks in terms of information security, along
+with noncompliance with rules and regulations [15,16]. Transmission authorities find it
+challenging to trust traditional PdM solutions run by black-box ML models that do not
+explain their mechanisms or decision processes. The difficulty in understanding how
+black-box models work discourages operators from accepting them because they need
+transparent explanations for decision confidence [17,18].
+ML uses existing data together with real-time data to extract unknown data patterns
+which solve challenging prediction challenges [19]. The application of ML algorithms pro-
+duces significant advantages by allowing for the analysis of high-dimensional multivariate
+datasets while uncovering the elaborate relationships that exist in industrial systems [20,21].
+However, the black-box nature of ML techniques creates interpretability challenges, which
+ultimately diminishes operator trust in automated decisions because they cannot compre-
+hend their predictive reasoning [22–24]. The essential nature of XAI rises to prominence
+since it delivers AI-driven models with transparency and interpretability that enhance
+operators’ ability to verify and execute actions based on PdM models [25–27].
+The traditional ML-based PdM frameworks require centralized data training, which
+creates essential privacy risks and breaches of security, as well as noncompliance with
+regulations. FL emerges as a powerful distributed AI method that addresses these crucial
+problems in existing systems [28]. The collaborative model training process using FL
+operates among distributed manufacturing sites or devices to preserve the security of
+sensitive raw data while meeting the regulatory standards [29,30].
+AI 2025, 6, 117
+4 of 24
+This research introduces a privacy-preserving XFL predictive model for Industry 4.0
+maintenance operations. This predictive XFL model uses FL for privacy protection and
+XAI techniques, including SHAP and LIME, for improved interpretability to deliver safe,
+transparent, and reliable decisions. This method provides security for sensitive data and
+improves trust, as well as adaptability and operational efficiency, therefore becoming an
+essential tool for PdM using intelligent methods in Industry 4.0 contexts.
+2. The Literature Review
+Modern Industry 4.0 developments have motivated extensive research on PdM sys-
+tems that implement AI and ML capabilities through distributed computing approaches.
+Numerous studies have explored AI-driven PdM strategies, emphasizing data-driven
+approaches to failure predictions and reliability improvements. The current research has
+failed to properly resolve the problems associated with protecting data privacy alongside
+the challenges of understanding models and achieving cross-industry compatibility. This
+section provides a critical analysis of the existing research on PdM, FL, and XAI, highlight-
+ing their key advancements, limitations, and unresolved challenges while identifying gaps
+that need further exploration in the field.
+Chen et al. [31] developed the Cox Proportional Hazard Deep Learning (CoxPHDL)
+model to resolve the data censoring and data sparsity challenges in functional maintenance
+information analyses. A combination of reliability optimization technology and deep
+learning resulted in better predictive outcomes for their developed method, according to
+the researchers. The autoencoder applied the first processing step of converting nominal
+data into a structured form, thus improving the reliability of the maintenance information.
+The researchers employed CoxPHM to calculate Time-Between-Failures (TBF) data for cases
+where this information was incomplete. The Long Short-Term Memory (LSTM) network
+served as a predictive tool that processed the preprocessed maintenance information for
+model training objectives. A large-scale real-world fleet maintenance dataset was used to
+test the proposed model, which exhibited better evaluation results in terms of the Root
+Mean Square Error (RMSE) and Matthew’s Correlation Coefficient (MCC). This study
+found that deep learning delivers effective PdM results yet emphasized the demand for
+better explanation methods and privacy protection solutions due to their importance to
+industrial deployment.
+Cheng et al. [32] introduced a Building Information Modeling (BIM) and IoT-based
+PdM framework for Facility Maintenance Management (FMM). Their model was structured
+into two layers: an application layer and an information layer. The application layer
+included four modules for PdM: a maintenance-planning module, a condition-prediction
+module, a condition-assessment module, and a fault-alarming module. The information
+layer integrated FMM system data with IoT network data and BIM model information to
+build an extensive maintenance solution. Artificial Neural Networks (ANNs) and Support
+Vector Machines (SVMs) functioned together in the prediction model to anticipate the
+future condition of mechanical, electrical, and plumbing modules. This research proved
+that combining BIM and the IoT makes PdM possible, yet issues of real-time adaptability,
+data privacy, and model interpretation require solutions.
+A PdM structure for nuclear infrastructure was developed in [33], which merged ML
+algorithms with performance anomaly detection methods. This study evaluated infrequent
+nuclear structure failures through the execution of Logistic Regression (LR) and SVM
+analytical methods. The SVM demonstrated a superior accuracy when compared to that
+of LR based on the evaluation metrics. A parameter optimization process was used to
+boost the predictive strength of each algorithm. Research was conducted on an extensive
+dataset while the developers formulated a new model for linking nuclear infrastructure
+AI 2025, 6, 117
+5 of 24
+data because of its challenging low-probability-density distributions. This study demon-
+strates how ML-based PdM performs effectively in tough, high-risk operational settings,
+although the researchers need to boost the model’s scalability and reliability for actual
+deployment systems.
+Zenisek et al. [34] proposed a Random Forest (RF)-based ML model for detecting
+concept drift in continuous data streams, aiming to identify wear, tear, and eventual failure
+in industrial machinery. This model evaluated real-time sensor inputs to detect developing
+faults that might cause system breakdowns. The new procedure demonstrated its capa-
+bility to minimize both operational and material expenses while maximizing operational
+efficiency. Building robust computational models demands both thoroughly checked and
+cleaned data of a superior quality, according to the study’s findings. This research de-
+veloped a new method for discovering drift concepts from streaming data that enabled
+the early detection of system malfunctioning. The synthetic data tests demonstrated the
+PdM capabilities of the model while confirming challenges with authentic data quality
+and adaptability.
+Research studies [35–37] demonstrate how FL combined with Blockchain and the
+Industrial IoT (IIoT) enhances the PdM capabilities of Industry 4.0. The FL framework
+allows different parties to jointly develop ML models independently from each other while
+preserving confidential data, thus securing distributed industrial systems. The imple-
+mentation of Blockchain technologies produces systems that generate transparent data
+maintenance records, which both preserve the data’s integrity and prevent any unautho-
+rized modifications. Industrial IoT sensors use their ability to detect hidden mechanical
+problems through real-time equipment condition data, which they transform into unusual
+energy consumption readings. These technologies combine integrated features to create
+advanced PdM systems to solve key data security needs, as well as meeting the privacy re-
+quirements and system reliability needs. Optimization of their computational performance
+and their real-world execution require further research to achieve smooth deployments of
+combined solutions.
+The researchers in [38] established two main interpretability approaches: local in-
+terpretations and global explanations. The interpretation system called LIME, together
+with SHAP, explains ML predictions in an agnostic manner and shows users how their
+models make choices for individual predictions. Global interpretability methods reveal
+complete model patterns to demonstrate how different features generate predictions in
+every portion of a dataset. Deep learning models have identified distinct interpretation
+approaches, such as Gradient-Weighted Class Activation Mapping (Grad-CAM) and at-
+tention mechanisms that highlight which input areas drive the model decisions because
+these systems demonstrate high complexity. This classification demonstrates why XAI
+techniques must be used in PdM to ensure transparency and AI’s trustworthiness while
+addressing industrial obstacles to adoption.
+Biswal and Sabareesh [39] developed a bench-top test rig for studying the vibration
+signatures of critical components in wind turbines, simulating the real-world operational
+conditions for condition monitoring. The research process collected vibration data from
+regular and faulty components before utilizing an ANN-based model which could dis-
+tinguish healthy from defective components. The created ANN model showed a 92.6%
+accuracy rate, which proved its capability to detect turbine component defects. Additional
+research is needed to solve two fundamental issues with AI-driven vibration analysis mod-
+els: their scalability to operational environments and their standardized fault identification
+performance for real-world situations.
+AI 2025, 6, 117
+6 of 24
+The data-based diagnostics and prognostics by Xiang et al. [40] improved machine
+performance and cut down maintenance expenses. Accurate supervised learning data
+labeling took place through serial number comparisons between target components across
+consecutive dates. Using real-world vending machine data, this study validated three
+different classifiers: SVM, RF, and Gradient Boosting Machines (GBMs). Additionally, two
+PdM models were introduced—one for diagnostics and another for two-stage prognostics.
+The diagnostics system achieved a greater than 80% accuracy when applied through cross-
+validation tests, and the GBM models displayed enhanced effectiveness compared to that
+of the standard prediction systems. This study proved that ML maintains its predictive
+abilities despite needing properly tagged data along with optimized models to achieve
+practical success.
+Huuhtanen and Jung [41] developed a deep-learning-based PdM model for photo-
+voltaic (PV) panels, employing Convolutional Neural Networks (CNNs) to monitor the
+operational performance. The proposed model predicted the PV panel electrical power
+curves by evaluating neighboring panel power outputs. The model found indicators of po-
+tential system failures by comparing its estimated power curves with actual measurements.
+Numerous experiments showed that the system successfully identified the actual power
+curves found in working PV panels while performing better than average interpolation
+methods. This work shows how CNN-driven fault detection achieves a high performance
+for renewable energy infrastructure, but additional research should focus on scalability
+solutions for its industrial real-world deployment.
+Table 1 includes a comparative analysis that demonstrates PdM methods through an
+analysis of the ML models, preprocessing methods, and predictive techniques used. The
+majority of the research lacks privacy-protected methods and interpretability capabilities
+for AI systems, thus preventing the development of trust and exposing data security
+issues. Several studies demonstrate real-time monitoring, while this capability remains
+a difficult barrier to overcome. Future research must address the four main areas where
+ML-driven PdM models bring improvements: fault detection, scalability, privacy, and
+interpretability capabilities.
+AI 2025, 6, 117
+7 of 24
+Table 1. Comparative analysis of various PdM models.
+Reference
+Model(s) Used
+Objective
+Preprocessing
+Technique
+Predictive
+Model
+Privacy-
+Preserving (FL)
+Interpretability
+(XAI)
+Scalability
+Regulatory
+Compli-
+ance
+Real-Time
+PdM
+Capability
+Strengths
+Limitations
+Chen et al. [31]
+CoxPHDL,
+Autoencoder, LSTM
+Address data
+censoring and
+sparsity in
+maintenance
+analyses
+Feature extraction;
+structured
+representation
+CoxPHM,
+LSTM
+✖
+✖
+Moderate
+✖
+✖
+An improved RMSE
+and MCC,
+optimized reliability
+Lacks explainability
+and privacy
+preservation;
+real-time limitations.
+Cheng et al. [32]
+BIM, IoT, ANN, SVM
+PdM for facility
+management
+Data integration from
+FM, IoT, and BIM
+ANN, SVM
+✖
+✖
+High
+✖
+2
+Effective BIM-IoT
+integration for PdM
+Lacks privacy and
+interpretability;
+real-time
+adaptability issues.
+[33]
+LR, SVM
+PdM for nuclear
+infrastructure
+Parameter
+optimization;
+anomaly detection
+LR, SVM
+✖
+✖
+Moderate
+✖
+✖
+ML-driven PdM for
+high-risk
+environments
+Needs improved
+scalability; lacks
+privacy and
+interpretability;
+real-time limitations.
+Zenisek et al. [34]
+RF
+Detect concept
+drift in
+continuous
+data streams
+Data screening;
+anomaly detection
+RF
+✖
+✖
+Moderate
+✖
+✖
+Early fault detection
+reduces costs
+Requires high-quality
+data, lacks privacy
+and interpretability,
+and
+real-time challenges.
+[35–37]
+FL, Blockchain, IIoT
+Enhance PdM in
+Industry 4.0
+Secure distributed
+training;
+anomaly detection
+Various
+ML models
+2
+✖
+High
+2
+2
+Strong data privacy,
+integrity, and
+real-time monitoring
+Lacks interpretability,
+computational
+efficiency, and
+real-world
+deployment
+challenges.
+[38]
+LIME, SHAP,
+Grad-CAM,
+Attention Mechanisms
+Classification of
+interpretability
+techniques
+Model-agnostic
+explainability;
+feature attribution
+Applied to
+various
+ML models
+✖
+2
+High
+2
+2
+Enhances model
+transparency and
+trust in AI decisions
+Lacks privacy and
+complexity in
+integrating XAI for
+real-time
+industrial use.
+Biswal and
+Sabareesh [39]
+ANN
+Condition
+monitoring of
+wind turbines
+Vibration data
+acquisition;
+feature extraction
+ANN
+✖
+✖
+Low
+✖
+✖
+A high classification
+accuracy (92.6%) for
+fault detection
+Lacks privacy and
+interpretability;
+limited scalability for
+diverse environments;
+real-time challenges.
+Xiang et al. [40]
+SVM, RF, GBM
+Diagnostics and
+prognostics
+for PdM
+Data labeling;
+supervised learning
+GBMs out-
+performed
+the others
+✖
+✖
+Moderate
+✖
+✖
+Over 80% accuracy in
+diagnostics and
+strong
+model optimization
+Requires accurate
+data labeling, lacks
+privacy snd
+interpretability;
+real-world validation
+needed; real-time
+adaptability issues.
+AI 2025, 6, 117
+8 of 24
+Table 1. Cont.
+Reference
+Model(s) Used
+Objective
+Preprocessing
+Technique
+Predictive
+Model
+Privacy-
+Preserving (FL)
+Interpretability
+(XAI)
+Scalability
+Regulatory
+Compli-
+ance
+Real-Time
+PdM
+Capability
+Strengths
+Limitations
+Huuhtanen
+and Jung [41]
+CNN
+PdM for
+PV panels
+Electrical power
+curve estimation
+CNN
+✖
+✖
+Moderate
+✖
+✖
+Accurate prediction
+of the power curve,
+better
+than interpolation
+Scalability and
+real-world
+deployment
+challenges; lacks
+privacy and
+interpretability;
+real-time limitations.
+Proposed
+XFL model
+FL, XAI (SHAP, LIME),
+AI-driven PdM
+Privacy-
+preserving and
+explainable PdM
+Secure data
+aggregation; model
+interpretability
+FL with
+AI-based
+PdM
+2
+2
+High
+2
+2
+Ensures privacy,
+enhances
+interpretability, and is
+scalable and real-time
+Computational
+complexity requires
+robust infrastructure
+for deployment.
+AI 2025, 6, 117
+9 of 24
+3. Limitations of Previous Research Works
+The analysis of the previous research in PdM highlights several critical limitations that
+need to be addressed:
+3.1. A Lack of Privacy-Preserving Techniques
+Without incorporating FL or alternative privacy-preserving methods, multiple stud-
+ies [31–34,38–41] have faced limitations regarding data security in industrial applica-
+tions. The lack of FL requires centralized sharing of sensitive operational data, which
+increases security breach risks, together with noncompliance risks concerning strict data
+protection legislation.
+3.2. A Lack of Explainability and Interpretability
+Most PdM models [31–34,39–41] lack XAI techniques, making their decision-making
+processes opaque. This lack of interpretability reduces trust in AI-driven predictions,
+making it difficult for industry professionals to understand models’ reasoning, validate the
+results, and ensure transparency in critical maintenance decisions.
+3.3. Limited Real-Time Processing and Scalability
+Several studies [31,33,34,39–41] have faced challenges in real-time processing, limiting
+their applicability in dynamic industrial environments. Many models require high com-
+putational resources or lack the adaptability to scale across multiple industrial settings,
+hindering their practical implementation for PdM in Industry 4.0.
+4. Contributions to the Proposed Work
+The proposed privacy-preserving XFL model for PdM addresses the key limitations
+identified in prior research:
+4.1. The Incorporation of FL for Data Privacy
+Unlike previous works, the proposed model integrates FL to enable secure, decen-
+tralized training without sharing raw data. This approach ensures regulatory compli-
+ance, data confidentiality, and robust cybersecurity, overcoming the privacy concerns
+seen in [31–34,39–41].
+4.2. Enhanced Model Interpretability with XAI
+To improve the transparency and trust in PdM decisions, the proposed model leverages
+XAI techniques such as SHAP and LIME. By making AI-driven insights more understand-
+able, this contribution mitigates the lack of interpretability and allows maintenance staff
+to verify root causes, prioritize repairs, and make timely decisions, directly enhancing the
+operational confidence and safety seen in studies like [31–34,39–41].
+4.3. Real-Time Processing and Scalable Industrial Deployment
+The proposed framework is designed for real-time PdM and adaptive learning, making
+it highly scalable across various industrial sectors. By addressing the real-time limitations
+observed in [31–34,39–41], the model ensures fast, data-driven decision-making, reducing
+downtimes and optimizing PdM strategies.
+5. The Proposed Model
+PdM in Industry 4.0 faces key challenges, including data privacy risks, a lack of
+interpretability, and real-time adaptability. Traditional centralized ML models require
+data sharing across sites, raising security and compliance concerns. Additionally, the
+lack of explainability in AI predictions limits trust and decision validation. While the
+AI 2025, 6, 117
+10 of 24
+conventional rule-based analytics and statistical models offer partial solutions, they struggle
+with scalability and adaptability in complex industrial environments.
+To enhance the predictive performance in Industry 4.0, this research proposes a privacy-
+preserving XFL model, integrating FL for secure, decentralized training and XAI techniques
+(SHAP, LIME) for transparent decision-making. The model delivers real-time fault identifi-
+cations alongside adaptive learning capabilities, and it allows for flexible scalability, which
+resolves crucial problems related to data privacy, as well as interpretation requirements and
+regulatory requirements. This enables proactive maintenance actions and reduces costly
+downtimes by guiding technicians through model-backed alerts with interpretable risk
+factors. Figure 3, Figure 4 and Figure 11 illustrate the PdM process, showcasing decen-
+tralized learning at the local server level for data privacy and aggregated updates at the
+global server level to enhance the predictive accuracy across industrial sites. Together, these
+figures showcase the XFL model’s ability to improve the predictive performance while
+maintaining security, transparency, and scalability in Industry 4.0.
+ 
+Figure 3. PdM process from data input to validation.
+ 
+Figure 4. An abstract view of the proposed XFL-based PdM model (local server).
+AI 2025, 6, 117
+11 of 24
+Figure 3 shows the PdM pipeline in Industry 4.0, where sensor data, such as process
+temperature, rotational speed, torque, tool wear, and air temperature, flow through the
+data input layer before their transmission to a central server for analysis. The model passes
+through a three-stage processing framework: preprocessing (cleaning and structuring
+the sensor data), processing (applying PdM models), and postprocessing (finalizing the
+data for validation). The trained data are then sent to the cloud computing infrastructure,
+where real-time inputs enable accurate maintenance predictions. This predictive framework
+ensures proactive maintenance, reducing downtimes and optimizing machine reliability
+across industrial applications.
+Figure 4 provides an abstract view of the proposed XFL-based PdM model at the
+local server level. The process begins at the data input layer, where the industrial sensor
+dataset [42] is collected from the operational parameters. Table 2 shows the features of
+the dataset.
+Table 2. Dataset feature description [42].
+Sr. No.
+Features
+Description
+1
+UDI
+int64
+2
+Product ID
+object
+3
+Type
+object
+4
+Air temperature [K]
+float64
+5
+Process temperature [K]
+float64
+6
+Rotational speed [rpm]
+int64
+7
+Torque [Nm]
+float64
+8
+Tool wear [min]
+Int64
+9
+Target
+int64
+10
+Failure type
+object
+These raw data undergo multiple transformations within the preprocessing layer,
+which includes data loading, an exploratory data analysis, feature engineering, feature
+selection, categorical encoding, and feature scaling, ensuring the data are structured and
+optimized for learning.
+Preprocessing involves removing multicollinear and high-cardinality features, fol-
+lowed by one-hot encoding for categorical variables and Min–Max scaling for nu-
+meric attributes.
+This ensures the model’s stability and faster convergence during
+federated training.
+Figure 5 illustrates the distribution of key PdM parameters, highlighting the vari-
+ations in machine behavior. Air and process temperature exhibit multi-modal patterns;
+rotational speed is right-skewed; torque follows a normal distribution; and tool wear is
+left-skewed. The overlaid KDE curves (red lines) provide deeper insights into the prob-
+ability distributions, aiding in feature selection and anomaly detection for an optimized
+PdM system.
+Figure 6 presents box plots and rug plots for key PdM parameters, analyzing their
+relationship with machine failures (0 = No Failure, 1 = Failure). The box plots highlight
+the distribution, the median, and the presence of outliers, while the rug plots show the
+density of data along the x-axis. Rotational speed and torque exhibit significant outliers,
+indicating variability in the machine conditions. Tool wear shows a wider range, with
+failures occurring across different wear levels. These insights help identify anomalies and
+thresholds crucial for PdM models.
+AI 2025, 6, 117
+12 of 24
+Figure 5. Data distribution of PdM parameters with KDE curves.
+ 
+Figure 6. Box plots and rug plots showing parameter distributions and failure trends for PdM.
+Figure 7 presents a heatmap analysis displaying the correlation between key PdM
+parameters. The color intensity represents the correlation strength, where values close
+to 1 indicate a strong positive correlation, and values near −1 show a strong negative
+correlation. Air temperature and process temperature exhibit a high positive correlation
+(0.88), suggesting their interdependence. In contrast, rotational speed and torque have a
+strong negative correlation (−0.88), indicating an inverse relationship. The other parameters
+AI 2025, 6, 117
+13 of 24
+show weak correlations, meaning they influence machine behavior independently. These
+insights help in the feature selection and model optimization for PdM.
+Figure 7. Heatmap analysis correlation among PdM parameters for feature selection.
+Figure 8 presents a comprehensive hexbin analysis of the key PdM parameters, show-
+casing their pairwise relationships. Air temperature and process temperature exhibit a
+strong positive correlation, while rotational speed and torque demonstrate a clear inverse
+relationship, confirming their interdependence. Other feature pairs, such as tool wear vs.
+torque and process temperature vs. rotational speed, display scattered distributions, indi-
+cating weak or non-linear dependencies. This visualization helps identify highly correlated
+features for feature selection and model optimization in PdM.
+Figure 8. Hexbin plots visualizing pairwise relationships among PdM parameters.
+AI 2025, 6, 117
+14 of 24
+Figure 9 presents a heatmap analysis of the distribution of machine failures across
+different machine types (H, M, L), where H-type machines show the lowest failure rates
+(21 out of 1003), M-type machines have moderate failures (83 out of 2997), and L-type
+machines exhibit the highest failures (235 out of 6000), indicating greater vulnerability.
+The “All” row summarizes the total failures, confirming that L-type machines are at the
+highest risk, making them a key target for PdM strategies to reduce breakdowns and
+improve reliability.
+Figure 9. Machine failure distribution across different types, highlighting high-risk categories for PdM.
+Figure 10 presents a bar chart analyzing the primary reasons behind machine failures.
+The most common failure type is Heat Dissipation Failure (112 occurrences), indicating
+overheating as a major issue. Power Failure follows, suggesting electrical instability is
+a significant concern. Overstrain Failure and Tool Wear Failure also contribute notably,
+highlighting mechanical stress and component degradation. Random Failures are the
+least frequent, implying that most failures have identifiable causes. These insights help in
+prioritizing maintenance strategies to mitigate the most critical failure risks.
+ 
+Figure 10. Frequency of reasons for machine failures for PdM planning.
+The processed dataset is then split into training (70%) and testing (30%) sets, enabling
+model development and validation. The training set is used to develop local server models,
+where processed data are utilized to train ML models for PdM. If the local models meet
+the accuracy thresholds, the predictions proceed to the cloud computing infrastructure,
+where real-time data inputs refine and enhance the model’s reliability further. The system
+AI 2025, 6, 117
+15 of 24
+continuously imports cloud data for further validation, ensuring adaptive learning. Finally,
+based on the predictive confidence levels, maintenance actions are triggered, allowing for
+proactive intervention before failures occur.
+While local models efficiently process machine sensor data for PdM, their effectiveness
+is further enhanced by global model aggregation, where insights from multiple industrial
+sites are synchronized for improved fault detection accuracy. Figures 4 and 11 illustrate the
+local server–client interaction, where each industrial site trains ML models independently
+before integrating into the federated PdM framework. Table 3 outlines the pseudocode
+detailing the step-by-step process, from the data collection and preprocessing to predictive
+modeling, validation, and synchronization with the global model.
+ 
+Figure 11. Proposed XFL-based PdM model (global server).
+Table 3. Pseudocode of proposed local server–client model for PdM.
+Step
+Process
+1
+Start
+2
+Data Collection: Gather real-time sensor data, S = {s1, s2, . . . , sn} (e.g., temperature, torque, speed,
+tool wear).
+3
+Preprocessing:
+2Data loading and inspection
+2Exploratory data analysis
+2Feature engineering
+2Feature selection
+2Categorical variable encoding
+2Feature scaling
+4
+Split Data: Partition the dataset into the training set (Tr) and the testing set (Te).
+5
+Model Training: Initialize ML models F = {F1, F2, . . . , Fk} for PdM.
+6
+Iterative Training: Optimize the learning rate L = L −η∇L, retrain until convergence
+Etrain < threshold.
+7
+Validation: Evaluate the model F(Te) with the accuracy Acc = f (F, Te). If Acc < threshold, retrain
+the model.
+8
+Store Trained Model: Save the optimized model F∗on the local server.
+9
+Global Model Sync (If Required): Send F∗to the global system for aggregation.
+10
+Real-Time Prediction: Import data from the cloud, generate failure predictions P = F ∗(S), and
+trigger maintenance alerts.
+11
+Stop
+AI 2025, 6, 117
+16 of 24
+Figure 11 illustrates the proposed XFL workflow for PdM in Industry 4.0. In this
+approach, multiple industrial sites (Industry 1 to Industry N) independently train the local
+ML models using their respective sensor data while preserving privacy. Each industrial
+site processes the data through three key layers:
+•
+The Input Layer: Collects real-time sensor data such as temperature, torque, rotational
+speed, and tool wear;
+•
+The Preprocessing Layer: Applies feature engineering, normalization, encoding, and
+scaling to prepare data for training;
+•
+The Application Layer: Trains a local PdM model for failure detection.
+Once the local models are trained, they are sent to the global cloud server, where a fed-
+erated aggregation mechanism updates the global model without exposing raw industrial
+data. However, while the raw data remain localized, no formal cryptographic mechanisms,
+such as Differential Privacy or Secure Aggregation, are applied in this version. The local
+model updates Wt
+i are computed as
+W(t+1)
+i
+= Wt
+i −η∇L
+ Wt
+i −Di
+
+(1)
+where Wt
+i represents the model weights at iteration t, η is the learning rate, and
+∇L
+ Wt
+i −Di
+
+is the gradient of the loss function L concerning the local dataset Di.
+Each trained local model sends only its weight updates to the global model. The
+server aggregates the models by selecting the best-performing local model, based on its
+evaluation score:
+W* = arg max
+Wi
+A(Wi, Vi)
+(2)
+where W* represents the aggregated global model, chosen based on the performance
+A(Wi, Vi) of each local model Wi on its validation dataset Vi. If the performance threshold
+τ is not met, local clients retrain their models with adjusted hyperparameters to improve
+the overall global accuracy.
+A performance-based aggregation strategy was used, where the best-performing local
+model updated the global model in each round. This choice was driven by the presence
+of non-independent and identically distributed (non-IID) data across industrial clients,
+where averaging techniques such as FedAvg and FedProx may have introduced gradient
+noise and reduced the generalization performance. Although a formal convergence proof is
+beyond the scope of this study, the empirical evidence from the simulation results demon-
+strates stable convergence across rounds without oscillation or divergence. Additionally,
+early stopping and validation-based thresholds were applied at the local client level to
+prevent overfitting and ensure stable training before model updates were shared with the
+global server.
+While the feature space and the data partitioning remained consistent across all clients
+(70:30), the local data distributions varied in terms of the frequency of failure types or oper-
+ational conditions. Therefore, the model selection was based on the validation performance
+to ensure generalization and minimize representational bias during aggregation.
+To ensure transparency and interpretability, XAI techniques such as SHAP and LIME
+are integrated. SHAP and LIME were chosen for their complementary strengths—SHAP
+offers global, model-agnostic explanations with consistent feature attribution, while LIME
+provides local interpretability for instance-level decisions. This combination meets PdM
+operators’ needs for both system-wide transparency and actionable insights. Other XAI
+AI 2025, 6, 117
+17 of 24
+methods (e.g., Grad-CAM, attention) were considered but are better suited to visual data
+rather than industrial tabular inputs. SHAP calculates the feature importance values using
+ϕj = ∑S⊆F\{j}
+|S|!(| F | −| S | −1)!
+| F |!
+[ f (S ∪{j}) −f (S)]
+(3)
+where ϕj is the SHAP value for the feature j, F is the feature set, and f (S) represents
+the model output when using only a subset S. LIME, on the other hand, explains the
+predictions by approximating the global model f (x) with a simple surrogate model g(x):
+ˆf (x) = arg min
+g∈GL(f, g, πx) + Ω(g)
+(4)
+where G is the set of interpretable models, L(f, g, πx) measures the local approximation
+error, and Ω(g) controls the model’s complexity to prevent overfitting.
+Once the global model is optimized, it is deployed for real-time PdM, where a new
+sensor data input S′ is classified based on the failure probability:
+P
+ f ailure | S′ = f
+
+Wt+1, S′
+(5)
+If P( f ailure | S′) > θ (the decision threshold), here, θ is an empirically selected decision
+threshold, tuned using validation data to balance between sensitivity and false alarms in
+failure predictions. PdM alerts are triggered, ensuring the proactive prevention of failures.
+This FL framework enables privacy-preserving, scalable, and interpretable PdM, improving
+industrial efficiency and reliability in Industry 4.0 environments. Table 4 presents the
+pseudocode for the proposed global server–client model, outlining the key steps from local
+model aggregation to real-time PdM.
+Table 4. The pseudocode of the proposed global server–client model for PdM.
+Steps
+Processes
+1. Global Model Initialization
+✔Initializes the global model W* and sets the performance
+threshold τ. The threshold τ is selected based on the validation
+accuracy to ensure only high-performing global models
+are deployed.
+2. Local Model Training and Aggregation
+✔Receives trained models Wi from local industries Ii trained
+on the dataset Di.
+✔Evaluates each local model using the validation dataset Vi.
+✔Selects the best-performing model based on evaluation:
+W* = arg max(Wi)A(Wi, Vi)
+3. Convergence Check and Retraining
+✔Checks convergence: If A(W*, V*) ≥τ, the model
+is deployed.
+✔If not converged, requests additional training with
+hyperparameter tuning.
+4. XAI Integration
+✔Applies SHAP and LIME for interpretability.
+✔Computes the SHAP values for feature importance:
+ϕj =
+∑
+S⊆F\{j}
+|S|!(| F | −| S | −1)!
+| F |!
+[ f (S ∪{j}) −f (S)]
+✔Trains a LIME surrogate model for interpretable
+local predictions.
+5. Global Model Deployment
+and Prediction
+✔Deploys the final model W*.
+✔Uses new sensor data s’ to predict failure probability:
+P( f ailure | S′) = f
+ Wt+1, S′
+✔If P( f ailure | S′) > θ, triggers automated maintenance.
+6. Storage and Completion
+✔Securely stores validated predictions in cloud storage.
+✔Terminates the process.
+6. Simulation Results
+PdM in Industry 4.0 faces challenges such as data privacy risks, a lack of inter-
+pretability, and the need for scalable, real-time fault detection. The traditional centralized
+AI 2025, 6, 117
+18 of 24
+models struggle with security concerns and regulatory compliance, while black-box AI
+models reduce operator trust. To address these issues, this study implements a privacy-
+preserving XFL framework, combining FL for decentralized training and XAI techniques
+(SHAP, LIME) for interpretability. Simulations were conducted on Google Colab, lever-
+aging its cloud-based computational power to evaluate the model’s predictive accuracy,
+scalability, efficiency, and privacy preservation. The implementation used Python 3.6.4
+with libraries including scikit-learn, pandas, NumPy, Matplotlib, SHAP, and LIME. All
+simulations were executed in a standard Colab CPU runtime with 12.6 GB of RAM, without
+GPU acceleration.
+The results highlight how XFL enhances real-time failure detection, optimizes mainte-
+nance scheduling, and ensures transparent AI-driven decision-making in industrial settings.
+The evaluation is performed using a real-world PdM dataset, with 70% of the data allo-
+cated for training and 30% for testing, ensuring a rigorous and comprehensive assessment.
+The model’s performance is analyzed through key PdM metrics, including the accuracy,
+sensitivity (True Positive Rate, TPR), specificity (True Negative Rate, TNR), miss rate
+(False Negative Rate, FNR), Positive Predictive Value (PPV), and Negative Predictive Value
+(NPV), as formally defined in Equations (6)–(11).
+Accuracy = ∑True Positive + ∑True Negative
+∑Total Population
+(6)
+Sensitivity =
+∑True Positive
+∑Condition Positive
+(7)
+Specificity =
+∑True Negative
+∑Condition Negative
+(8)
+Miss −Rate = 1 −Accuracy
+(9)
+Positive Predictive Value =
+∑True Positive
+∑Predicted Condition Positive
+(10)
+Negative Predictive Value =
+∑True Negative
+∑Predicted Condition Negative
+(11)
+Table 5 presents the confusion matrix results for four different ML classifiers—the
+K-Neighbors Classifier, the Gradient Boosting Classifier, the Bagging Classifier, and the Hist
+Gradient Boosting Classifier—evaluated on both the training (8000 samples) and testing
+(2000 samples) datasets. The True Positive (TP) values indicate correctly predicted failures,
+while True Negative (TN) values represent correctly identified non-failures. False Positives
+(FPs) denote cases where a failure was incorrectly predicted, and False Negatives (FNs)
+correspond to undetected failures.
+Table 5. A confusion matrix of the proposed XFL-based PdM model.
+Confusion Matrix
+K Neighbors Classifier
+Gradient Boosting Classifier
+Bagging Classifier
+Hist Gradient Boosting Classifier
+Train (8000)
+Test (2000)
+Train (8000)
+Test (2000)
+Train (8000)
+Test (2000)
+Train (8000)
+Test (2000)
+True Positive (TP)
+7698
+1928
+7711
+1929
+7720
+1925
+7721
+1924
+True Negative (TN)
+100
+18
+161
+34
+254
+33
+270
+34
+False Positive (FP)
+24
+11
+11
+10
+2
+14
+1
+15
+False Negative (FN)
+178
+43
+117
+27
+24
+28
+8
+27
+The Hist Gradient Boosting Classifier achieved the highest TP (7721) and TN (270)
+values, suggesting its superior predictive performance with minimal false negatives
+(FN = 8 on training, 27 on testing). The Bagging Classifier also showed a strong per-
+formance, with high TPs (7720) and relatively low FNs (24 on training, 28 on testing). The
+Gradient Boosting Classifier and the K-Neighbors Classifier performed slightly lower, with
+AI 2025, 6, 117
+19 of 24
+higher FN values, indicating more undetected failures. Overall, these results highlight the
+effectiveness of ensemble-based methods, particularly Hist Gradient Boosting, in accurately
+predicting failures with minimal misclassifications.
+Table 6 presents the performance evaluation of the four different ML classifiers—the
+K-Neighbors Classifier, the Gradient Boosting Classifier, the Bagging Classifier, and the Hist
+Gradient Boosting Classifier—on both the training (8000 samples) and testing (2000 samples)
+datasets. This evaluation is based on key PdM metrics, including the accuracy, sensitivity
+(TPR), specificity (TNR), miss rate (FNR), Positive Predictive Value (PPV), and Negative
+Predictive Value (NPV). The accuracy values range from 97.3% to 99.89% in training and
+97.9% to 98.15% in testing, while the sensitivity remains high across the models, with values
+between 97.74% and 99.9%. Specificity shows variation across models, ranging from 62.07%
+to 99.63% in training and 69.39% to 93.6% in testing, reflecting differences in identifying
+non-failure cases. The miss rate (FNR) varies between 0.11% and 2.7%, while the Positive
+Predictive Value (PPV) maintains high consistency, ranging from 99.23% to 99.99%. The
+Negative Predictive Value (NPV) ranges from 29.51% to 97.12% in training and 55.74% in
+testing, indicating how well the models predict non-failure instances. These performance
+evaluations provide insights into the reliability and effectiveness of the locally trained
+models, which are further aggregated in the FL framework to enhance the global efficiency
+of PdM.
+Table 6. The performance metrics of the proposed XFL-based PdM model.
+Performance Metrics
+K Neighbors Classifier
+Gradient Boosting Classifier
+Bagging Classifier
+Hist Gradient Boosting Classifier
+Train
+Test
+Train
+Test
+Train
+Test
+Train
+Test
+Accuracy
+97.48
+97.3
+98.4
+98.15
+99.68
+97.9
+99.89
+97.9
+Sensitivity (TPR)
+97.74
+97.82
+98.51
+98.62
+99.69
+98.57
+99.9
+98.62
+Specificity (TNR)
+80.65
+62.07
+93.6
+77.27
+99.22
+70.21
+99.63
+69.39
+Miss rate (FNR)
+2.52
+2.7
+1.6
+1;85
+0.32
+2.1
+0.11
+2.1
+Positive Predictive Value (PPV)
+99.69
+99.43
+99.86
+99.48
+99.97
+99.28
+99.99
+99.23
+Negative Predictive Value (NPV)
+35.97
+29.51
+57.91
+55.74
+91.37
+54.1
+97.12
+55.74
+After applying FL, the Gradient Boosting Classifier emerged as the best global model,
+achieving a superior predictive accuracy while ensuring data privacy. It performed con-
+sistently locally and after aggregation, with strong generalization on diverse and non-
+IID industrial data and minimal false negatives. The aggregation strategy selected the
+highest-performing local model per round, where only the model parameters—not the raw
+data—were shared with the server, ensuring privacy. Its balanced sensitivity and specificity,
+further confirming it as the optimal choice for federated PdM in Industry 4.0.
+Figure 12a illustrates the application of XAI using LIME on the global PdM model,
+where a testing sample is analyzed to interpret the model’s decision-making process. The
+left-hand section presents the prediction probabilities, where the model assigns a 99%
+probability to “No Failure” and only 1% to “Failure”, indicating a low risk of failure for this
+specific test instance. The middle section visualizes the decision boundaries, highlighting
+key contributing factors such as tool wear, power, and temperature differences, where a
+higher tool wear value (>0.64) increases the likelihood of failure. The right-hand section
+lists the feature values from the test sample, showing that tool wear (0.78) and power
+(0.50) had the most significant influence. Since this explanation is derived from an unseen
+test instance, it helps evaluate the model’s interpretability and reliability in real-world
+PdM scenarios.
+AI 2025, 6, 117
+20 of 24
+ 
+(a) 
+ 
+(b) 
+Figure 12. (a,b) LIME-based explanation of the global PdM model on a testing sample.
+Figure 12b demonstrates the application of LIME to the global PdM model, analyz-
+ing a testing sample to interpret its failure predictions. The left-hand section displays
+the prediction probabilities, where the model assigns an 84% probability to “No Failure”
+and a 16% probability to “Failure”, suggesting a relatively low failure risk for this test
+instance. The middle section highlights the decision boundaries, indicating that a tem-
+perature difference (temp_diff ≤0.37) is the most influential factor contributing to the
+likelihood of failure. Additional features, such as tool wear (0.40) and power (0.59), also
+impact the classification. The right-hand section lists the feature values from the test
+sample, confirming the key variables influencing the model’s decision. This explanation
+enhances transparency, allowing industrial operators to understand and validate PdM
+decisions better.
+Figure 13 shows a dependence plot from the SHAP analysis displaying tool wear’s
+influence on the failure predictions throughout the global PdM model. The model’s
+decision-making process depends on the SHAP values displayed on the y-axis, while tool
+wear levels appear on the x-axis. The failure probability sharply increases when the tool
+wear value surpasses 0.6. The shape gradient shows the power levels, where higher power
+levels intensify this impact. This visual representation demonstrates that tool wear serves as
+the primary failure risk indicator, whose strength is enhanced during high-power operating
+scenarios, helping technicians develop proactive maintenance solutions.
+Figure 13. SHAP dependence plot for global PdM model.
+AI 2025, 6, 117
+21 of 24
+Table 7 compares the proposed XFL model with existing PdM approaches. While
+prior models such as ANN—(92.6%) [39], RF—(95%) [43], and SVM-based methods (80%)
+show moderate accuracy, they lack interpretability, rely on centralized data processing,
+and suffer from higher miss rates, making them less suitable for collaborative and ex-
+plainable industrial use. The proposed XFL model (98.15%) demonstrates a better per-
+formance compared to that of the traditional models [39,40,43–48] by leveraging FL for
+privacy preservation and SHAP/LIME-based XAI for interpretable decision support, ad-
+dressing both the transparency and security limitations of the baselines for enhanced
+predictive reliability.
+Table 7. A comparison of the proposed XFL model for PdM.
+References
+Model
+Accuracy (%)
+Miss-Rate (%)
+Biswal et al., 2015 [39]
+ANN
+92.6
+7.4
+Paolanti et al., 2018 [43]
+RF
+95
+5
+Xiang et al., 2018 [40]
+SVM, RF, GBM
+80
+20
+Durbhaka et al., 2016 [44]
+SVM, K-means, KNN,
+Euclidean distance,
+and CRA
+93
+7
+Karlsson et al., 2020 [45]
+LR
+87
+13
+Liu et al., 2023 [46]
+LR
+67.71
+32.29
+Li et al., 2022 [47]
+LSTM
+79.30
+20.7
+Ahn et al., 2023 [48]
+FL + 1DCNN-BiLSTM
+97.2
+2.8
+The proposed XFL model for PdM
+FL + XAI
+98.15
+1.85
+7. Conclusions
+The increasing complexity of industrial systems in Industry 4.0 necessitates advanced
+PdM solutions to prevent unexpected failures, optimize system efficiency, and reduce oper-
+ational costs. Traditional PdM models face significant challenges, including data privacy
+risks, a lack of interpretability, and centralized processing constraints. AI adoption in indus-
+trial systems poses serious privacy risks, such as unauthorized data exposure and model
+inversion attacks. The proposed FL-based approach addresses these challenges by ensuring
+that data never leave the source, enabling secure model training across sensitive indus-
+trial environments. To address these challenges, this study presents a privacy-preserving
+XFL model, integrating FL and XAI to enable secure, decentralized PdM with enhanced
+transparency. By allowing multiple industrial sites to collaboratively train models while
+keeping the raw data private, the XFL framework ensures compliance with data security
+regulations and enhances the predictive accuracy. The proposed model achieves a 98.15%
+accuracy with a 1.85% miss rate, significantly improving upon the traditional PdM ap-
+proaches. Furthermore, SHAP and LIME ensure the interpretability of the predictions,
+enabling technicians to verify outcomes and act confidently.
+8. Limitations and Future Work
+While the XFL model enhances privacy, interpretability, and predictive accuracy, minor
+challenges remain. FL introduces a computational and communication overhead, which
+can be optimized through efficient communication strategies. In bandwidth-constrained
+environments, this may impact the deployment latency. Variability in the local data may
+impact the convergence but could be addressed using adaptive learning techniques. More-
+over, although the raw data remain local, the current model does not incorporate formal
+privacy-preserving mechanisms such as Differential Privacy or Secure Aggregation, which
+future work aims to explore for quantifiable protection.
+Further improvements in XAI feature attribution could enhance transparency, particu-
+larly in making the outputs understandable for non-technical stakeholders and extending
+AI 2025, 6, 117
+22 of 24
+towards mechanism-level interpretability for failures. Future research should focus on
+refining the FL aggregation, enabling real-time adaptability, and advancing XAI methods
+for broader industrial application. Additionally, future work will address class imbalances
+using resampling or cost-sensitive learning to improve the sensitivity to rare failure events
+while preserving the realism of industrial data.
+Author Contributions: H.M.H.A.A. and S.J.A. collected the data from different resources and
+contributed to writing and preparing the original draft. H.M.H.A.A. and M.A.K. performed the
+formal analysis and simulations and contributed to writing, review, and editing, M.A.K. supervised.
+S.J.A. drafted the pictures and tables. H.M.H.A.A. and S.J.A. revised and improved the quality of the
+draft. All authors have read and agreed to the published version of the manuscript.
+Funding: This research received no external funding.
+Institutional Review Board Statement: Not applicable.
+Informed Consent Statement: Not applicable.
+Data Availability Statement: The simulation files/data used to support the findings of this study
+can be made available by the corresponding author upon request.
+Conflicts of Interest: The authors declare no conflicts of interest.
+References
+1.
+Goel, R.; Gupta, P. Robotics and Industry 4.0. A Roadmap to Industry 4.0: Smart Production, Sharp Business, and Sustainable Development;
+Springer Nature: Berlin/Heidelberg, Germany, 2020; pp. 157–169.
+2.
+Zalte, S.; Deshmukh, S.; Patil, P.; Patil, M.; Kamat, R.K. Industry 4.0: Design Principles, Technologies, and Applications.
+In Handbook of Research on Technical, Privacy, and Security Challenges in a Modern World; IGI Global: Hershey, PA, USA, 2022;
+pp. 25–45.
+3.
+Sun, Y.; Jung, H. Machine Learning (ML) Modeling, IoT, and Optimizing Organizational Operations through Integrated Strategies:
+The Role of Technology and Human Resource Management. Sustainability 2024, 16, 6751. [CrossRef]
+4.
+Kumar, P.; Chinthamu, N.; Misra, S.; Shiva, J. Smart Decision-Making in Industry 4.0: Bayesian Meta-Learning and Machine
+Learning Approaches for Multimodal Tasks. In Proceedings of the 3rd International Conference on Optimization Techniques in
+the Field of Engineering (ICOFE-2024), Tiruchengode, India, 22–23 October 2024. [CrossRef]
+5.
+Mohanty, A.; Mohapatra, A.G.; Mohanty, S.K.; Mahalik, N.P.; Anand, J. Leveraging Digital Twins for Optimal Automation
+and Smart Decision-Making in Industry 4.0: Revolutionizing Automation and Efficiency. In Handbook of Industrial and Business
+Applications with Digital Twins; CRC Press: Boca Raton, FL, USA, 2024; pp. 221–242.
+6.
+Rosunee, S.; Unmar, R. Predictive Maintenance for Industry 4.0. In Intelligent and Sustainable Engineering Systems for Industry 4.0
+and Beyond; CRC Press: Boca Raton, FL, USA, 2025; pp. 117–127.
+7.
+Sarje, S.H.; Kumbhalkar, M.A.; Washimkar, D.N.; Kulkarni, R.H.; Jaybhaye, M.D.; Al Doori, W.H. Current Scenario of Maintenance 4.0
+and Opportunities for Sustainability-Driven Maintenance. Adv. Sustain. Sci. Eng. Technol. 2025, 7, 0250102. [CrossRef]
+8.
+Babaeimorad, S.; Fattahi, P.; Fazlollahtabar, H.; Shafiee, M. An integrated optimization of production and preventive maintenance
+scheduling in industry 4.0. Facta Univ. Ser. Mech. Eng. 2024, 22, 711–720. [CrossRef]
+9.
+Çınar, Z.M.; Abdussalam Nuhu, A.; Zeeshan, Q.; Korhan, O.; Asmael, M.; Safaei, B. Machine learning in predictive maintenance
+towards sustainable smart manufacturing in industry 4.0. Sustainability 2020, 12, 8211. [CrossRef]
+10.
+Hoffmann, M.A.; Lasch, R. Unlocking the Potential of Predictive Maintenance for Intelligent Manufacturing: A Case Study On
+Potentials, Barriers, and Critical Success Factors. Schmalenbach J. Bus. Res. 2025, 77, 27–55. [CrossRef]
+11.
+Gupta, K.; Kaur, P. Application of Predictive Maintenance in Manufacturing with the Utilization of AI and IoT Tools.
+Authorea Preprints. 2024. Available online: https://www.techrxiv.org/users/870921/articles/1251882-application-of-predictive-
+maintenance-in-manufacturing-with-the-utilization-of-ai-and-iot-tools (accessed on 2 January 2025).
+12.
+Rayarao, S.R. Advanced Predictive Maintenance Strategies: Insights from the AI4I 2020 Dataset. Authorea Preprints. 2024.
+13.
+Karwa, R.R.; Bamnote, G.R.; Dhumale, Y.A.; Deshmukh, P.P.; Meshram, R.A.; Iqbal, S.M. Predictive Maintenance: Machine
+Learning Approaches for Enhanced Equipment Reliability. In Proceedings of the 2024 2nd DMIHER International Conference on
+Artificial Intelligence in Healthcare, Education and Industry (IDICAIEI), Wardha, India, 29–30 November 2024; IEEE: New York,
+NY, USA, 2024; pp. 1–6.
+14.
+Stark, J. Barriers to Successful Implementation of PDM. In Product Lifecycle Management (Volume 2) The Devil Is in the Details;
+Springer International Publishing: Cham, Switzerland, 2015; pp. 371–386.
+AI 2025, 6, 117
+23 of 24
+15.
+Alabadi, M.; Habbal, A. Next-generation predictive maintenance: Leveraging blockchain and dynamic deep learning in a
+domain-independent system. PeerJ Comput. Sci. 2023, 9, e1712. [CrossRef]
+16.
+Rustambekov, I.; Saidakhmedovich, G.S.; Abduvaliyev, B.; Kan, E.; Abdukhakimov, I.; Yakubova, M.; Karimov, D. Predic-
+tive Maintenance of Smart Grid Components Based on Real-Time Data Analysis. In Proceedings of the 2024 6th Interna-
+tional Conference on Control Systems, Mathematical Modeling, Automation and Energy Efficiency (SUMMA), Lipetsk, Russia,
+13–15 November 2024; IEEE: New York, NY, USA, 2024; pp. 949–952.
+17.
+Kalaiselvi, K.; Niranjana, K.; Prithivirajan, V.; Kumar, K.S.; Syambabu, V.; Sathiya, B. Machine Learning for Predictive Maintenance
+in Industrial Equipment: Challenges and Application. In Proceedings of the 2024 4th Asian Conference on Innovation in
+Technology (ASIANCON), Pimari Chinchwad, India, 23–25 August 2024; IEEE: New York, NY, USA, 2024; pp. 1–6.
+18.
+Ghelani, D. Harnessing machine learning for predictive maintenance in energy infrastructure: A review of challenges and
+solutions. Int. J. Sci. Res. Arch. 2024, 12, 1138–1156. [CrossRef]
+19.
+Srinivas, M.; Sucharitha, G.; Matta, A. (Eds.) Machine Learning Algorithms and Applications; John Wiley & Sons: Hoboken, NJ, USA, 2021.
+20.
+Nasarian, E.; Alizadehsani, R.; Acharya, U.R.; Tsui, K.L. Designing interpretable ML system to enhance trust in healthcare:
+A systematic review to propose a responsible clinician-AI-collaboration framework. Inf. Fusion 2024, 108, 102412. [CrossRef]
+21.
+Belghachi, M. A review on explainable artificial intelligence methods, applications, and challenges. Indones. J. Electr. Eng. Inform. (IJEEI)
+2023, 11, 1007–1024. [CrossRef]
+22.
+Cakir, M.; Guvenc, M.A.; Mistikoglu, S. The experimental application of popular machine learning algorithms on predictive
+maintenance and the design of IIoT-based condition monitoring system. Comput. Ind. Eng. 2021, 151, 106948. [CrossRef]
+23.
+Carvalho, T.P.; Soares, F.A.; Vita, R.; Francisco, R.D.P.; Basto, J.P.; Alcalá, S.G. A systematic literature review of machine learning
+methods applied to predictive maintenance. Comput. Ind. Eng. 2019, 137, 106024. [CrossRef]
+24.
+Ayvaz, S.; Alpay, K. Predictive maintenance system for production lines in manufacturing: A machine learning approach using
+IoT data in real-time. Expert Syst. Appl. 2021, 173, 114598. [CrossRef]
+25.
+Moosavi, S.; Farajzadeh-Zanjani, M.; Razavi-Far, R.; Palade, V.; Saif, M. Explainable AI in manufacturing and industrial
+cyber–physical systems: A survey. Electronics 2024, 13, 3497. [CrossRef]
+26.
+Kumar, V.; Yadav, V.; Singh, A.P. Demystifying Predictive Maintenance: Achieving Transparency through Explainable AI.
+In Proceedings of the 2024 1st International Conference on Advanced Computing and Emerging Technologies (ACET), Ghaziabad,
+India, 23–24 August 2024; IEEE: New York, NY, USA, 2024; pp. 1–7.
+27.
+Vollert, S.; Atzmueller, M.; Theissler, A. Interpretable Machine Learning: A brief survey from the predictive maintenance
+perspective. In Proceedings of the 26th IEEE International Conference on Emerging Technologies and Factory Automation (ETFA),
+Västerås, Sweden, 7–10 September 2021; IEEE: New York, NY, USA, 2021; pp. 01–08.
+28.
+Nguyen, D.C.; Ding, M.; Pathirana, P.N.; Seneviratne, A.; Li, J.; Poor, H.V. Federated learning for internet of things: A comprehen-
+sive survey. IEEE Commun. Surv. Tutor. 2021, 23, 1622–1658. [CrossRef]
+29.
+Boobalan, P.; Ramu, S.P.; Pham, Q.V.; Dev, K.; Pandya, S.; Maddikunta, P.K.R.; Gadekallu, T.R.; Huynh-The, T. Fusion of federated
+learning and industrial Internet of Things: A survey. Comput. Netw. 2022, 212, 109048. [CrossRef]
+30.
+Farahani, B.; Monsefi, A.K. Smart and collaborative industrial IoT: A federated learning and data space approach. Digit. Commun. Netw.
+2023, 9, 436–447. [CrossRef]
+31.
+Chen, C.; Liu, Y.; Wang, S.; Sun, X.; Di Cairano-Gilfedder, C.; Titmus, S.; Syntetos, A.A. Predictive maintenance using cox
+proportional hazard deep learning. Adv. Eng. Inform. 2020, 44, 101054. [CrossRef]
+32.
+Cheng, J.C.; Chen, W.; Chen, K.; Wang, Q. Data-driven predictive maintenance planning framework for MEP components based
+on BIM and IoT using machine learning algorithms. Autom. Constr. 2020, 112, 103087. [CrossRef]
+33.
+Gohel, H.A.; Upadhyay, H.; Lagos, L.; Cooper, K.; Sanzetenea, A. Predictive maintenance architecture development for nuclear
+infrastructure using machine learning. Nucl. Eng. Technol. 2020, 52, 1436–1442. [CrossRef]
+34.
+Zenisek, J.; Holzinger, F.; Affenzeller, M. Machine learning-based concept drift detection for predictive maintenance. Comput. Ind. Eng.
+2019, 137, 106031. [CrossRef]
+35.
+Zhang, W.; Lu, Q.; Yu, Q.; Li, Z.; Liu, Y.; Lo, S.K.; Chen, S.; Xu, X.; Zhu, L. Blockchain-based federated learning for device failure
+detection in industrial IoT. IEEE Internet Things J. 2020, 8, 5926–5937. [CrossRef]
+36.
+Oladapo, K.A.; Adedeji, F.; Nzenwata, U.J.; Quoc, B.P.; Dada, A. Fuzzified case-based reasoning blockchain framework for
+predictive maintenance in industry 4.0. In Data Analytics and Computational Intelligence: Novel Models, Algorithms and Applications;
+Springer Nature: Cham, Switzerland, 2023; pp. 269–297.
+37.
+Kaul, K.; Singh, P.; Jain, D.; Johri, P.; Pandey, A.K. Monitoring and controlling energy consumption using IOT-based predictive
+maintenance. In Proceedings of the 2021 10th International Conference on System Modeling & Advancement in Research Trends
+(SMART), Moradabad, India, 10–11 December 2021; IEEE: New York, NY, USA, 2021; pp. 587–594.
+38.
+Carvalho, D.V.; Pereira, E.M.; Cardoso, J.S. Machine learning interpretability: A survey on methods and metrics. Electronics 2019,
+8, 832. [CrossRef]
+AI 2025, 6, 117
+24 of 24
+39.
+Biswal, S.; Sabareesh, G.R. Design and development of a wind turbine test rig for condition monitoring studies. In Proceed-
+ings of the 2015 International Conference on Industrial Instrumentation and Control (ICIC), Pune, India, 28–30 May 2015;
+IEEE: New York, NY, USA, 2015; pp. 891–896.
+40.
+Xiang, S.; Huang, D.; Li, X. A generalized predictive framework for data-driven prognostics and diagnostics using machine
+logs. In Proceedings of the TENCON 2018—2018 IEEE Region 10 Conference, Jeju Island, Republic of Korea, 28–31 October 2018;
+IEEE: New York, NY, USA, 2018; pp. 0695–0700.
+41.
+Huuhtanen, T.; Jung, A. Predictive maintenance of photovoltaic panels via deep learning. In Proceedings of the 2018 IEEE Data
+Science Workshop (DSW), Lausanne, Switzerland, 4–6 June 2018; IEEE: New York, NY, USA, 2018; pp. 66–70.
+42.
+Available online: https://www.kaggle.com/code/atom1991/predictive-maintenance-for-industrial-devices/input (accessed on
+2 January 2025).
+43.
+Paolanti, M.; Romeo, L.; Felicetti, A.; Mancini, A.; Frontoni, E.; Loncarski, J. Machine learning approach for predictive maintenance
+in industry 4.0. In Proceedings of the 2018 14th IEEE/ASME International Conference on Mechatronic and Embedded Systems
+and Applications (MESA), Oulu, Finland, 2–4 July 2018; IEEE: New York, NY, USA, 2018; pp. 1–6.
+44.
+Durbhaka, G.K.; Selvaraj, B. Predictive maintenance for wind turbine diagnostics using vibration signal analysis based on a
+collaborative recommendation approach. In Proceedings of the 2016 International Conference on Advances in Computing,
+Communications, and Informatics (ICACCI), Jaipur, India, 21–24 September 2016; IEEE: New York, NY, USA, 2016; pp. 1839–1842.
+45.
+Karlsson, L. Predictive Maintenance for RM12 with Machine Learning. 2020. Available online: https://www.diva-portal.org/
+smash/record.jsf?pid=diva2:1437847&dswid=-5590 (accessed on 2 January 2025).
+46.
+Liu, J.; Cheng, H.; Liu, Q.; Wang, H.; Bu, J. Research on the damage diagnosis model algorithm of cable-stayed bridges based on
+data mining. Sustainability 2023, 15, 2347. [CrossRef]
+47.
+Li, J.; Zhu, D.; Li, C. Comparative analysis of BPNN, SVR, LSTM, Random Forest, and LSTM-SVR for conditional simulation of
+non-Gaussian measured fluctuating wind pressures. Mech. Syst. Signal Process. 2022, 178, 109285. [CrossRef]
+48.
+Ahn, J.; Lee, Y.; Kim, N.; Park, C.; Jeong, J. Federated learning for predictive maintenance and anomaly detection using time
+series data distribution shifts in manufacturing processes. Sensors 2023, 23, 7331. [CrossRef]
+Disclaimer/Publisher’s Note: The statements, opinions and data contained in all publications are solely those of the individual
+author(s) and contributor(s) and not of MDPI and/or the editor(s). MDPI and/or the editor(s) disclaim responsibility for any injury to
+people or property resulting from any ideas, methods, instructions or products referred to in the content.
