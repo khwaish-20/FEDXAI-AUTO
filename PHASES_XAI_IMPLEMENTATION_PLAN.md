@@ -141,13 +141,15 @@
 | **Script** | `federated_training_advanced.py` → `client.personalize()` method |
 | **Status** | ✅ COMPLETE |
 
-### Step 3.5: XAI Translation Layer (SHAP Integration)
+### Step 3.5: XAI Translation Layer (SHAP + LIME Integration)
 | Item | Detail |
 |------|--------|
-| **Global XAI** | `shap.GradientExplainer` on CNN+LSTM model → aggregated feature importance over 30-second windows |
-| **Local XAI** | `shap.force_plot` for individual failure cases → interactive HTML report showing which sensors pushed the prediction towards "Failure" |
-| **Translation Logic** | SHAP values mapped to mechanic-friendly alerts: `Fuel Pressure↓ + Fuel Trim↑` → "Fuel Filter Clog / Pump Wear", `Coolant Temp↑` → "Cooling System Failure" |
-| **Artifacts** | `shap_summary_plot.png` (Global), `shap_force_plot_failure.html` (Local) |
+| **Global XAI (SHAP)** | `shap.GradientExplainer` on CNN+LSTM model -> aggregated feature importance over 20-second windows |
+| **Local XAI (SHAP)** | `shap.force_plot` for individual failure cases -> interactive HTML report showing which sensors pushed the prediction towards "Failure" |
+| **Global XAI (LIME)** | `lime.lime_tabular.LimeTabularExplainer` on time-averaged features -> aggregated feature importance bar chart |
+| **Local XAI (LIME)** | Individual LIME explanations for failure and healthy cases showing feature conditions (e.g., "Engine RPM > 0.72") and their directional impact |
+| **Translation Logic** | SHAP/LIME values mapped to mechanic-friendly alerts: `Fuel Pressure down + Fuel Trim up` -> "Fuel Filter Clog / Pump Wear", `Coolant Temp up` -> "Cooling System Failure" |
+| **Artifacts** | `shap_summary_plot.png`, `shap_force_plot_failure.html`, `lime_explanation_failure.png`, `lime_explanation_healthy.png`, `lime_feature_importance.png` |
 | **Script** | `xai_analysis.py` |
 | **Status** | ✅ COMPLETE |
 
@@ -167,15 +169,15 @@
 | **Miss Rate** | **1.21%** (only 25 failures missed out of 2,072) |
 | | |
 | **Confusion Matrix** | `TN=1942  FP=22  /  FN=25  TP=2047` |
-| **Privacy** | DP noise (σ=0.00005) + SecAgg validated across 10 FL rounds |
-| **XAI** | SHAP Global (`shap_summary_plot.png`) + Local (`shap_force_plot_failure.html`) |
+| **Privacy** | DP noise (sigma=0.00005) + SecAgg validated across 10 FL rounds |
+| **XAI** | SHAP Global (`shap_summary_plot.png`) + SHAP Local (`shap_force_plot_failure.html`) + LIME (`lime_explanation_failure.png`, `lime_feature_importance.png`) |
 | **Personalization** | FL rounds maintained 98.56% accuracy (no degradation from DP/SecAgg) |
 
 ---
 
 ## Phase 4: Indian Solution — Productization & Edge Deployment
 > *Flowchart Reference: `PHASE 4: INDIAN SOLUTION`*
-> **Objective:** Compress the trained model, flash it to an OBD-II dongle, and deliver maintenance alerts via a mobile app.
+> **Objective:** Compress the trained model, flash it to an OBD-II dongle, and deliver maintenance alerts via a web dashboard.
 
 ### Step 4.1: TinyML Compression (Model Quantization)
 | Item | Detail |
@@ -250,9 +252,12 @@
 | `fedxai_production_best.keras` | 3 | **Best production model (98.84% accuracy)** |
 | `fedxai_advanced_global.keras` | 3 | Earlier advanced global model |
 | `generate_report.py` | 3 | Quick evaluation/reporting script |
-| `xai_analysis.py` | 3 | SHAP-based explainability analysis |
-| `shap_summary_plot.png` | 3 | Global feature importance visualization |
-| `shap_force_plot_failure.html` | 3 | Local failure explanation (interactive HTML) |
+| `xai_analysis.py` | 3 | SHAP + LIME dual-method explainability analysis |
+| `shap_summary_plot.png` | 3 | SHAP global feature importance visualization |
+| `shap_force_plot_failure.html` | 3 | SHAP local failure explanation (interactive HTML) |
+| `lime_explanation_failure.png` | 3 | LIME local explanation for failure case |
+| `lime_explanation_healthy.png` | 3 | LIME local explanation for healthy case |
+| `lime_feature_importance.png` | 3 | LIME aggregated feature importance bar chart |
 | `phase4_tinyml.py` | 4 | TinyML pipeline: CNN retrain + TFLite conversion + validation |
 | `validate_tflite.py` | 4 | TFLite model accuracy validation |
 | `fedxai_edge_cnn.keras` | 4 | Pure CNN edge model (97.32% accuracy) |
@@ -272,7 +277,7 @@
 | **Phase 1** | Foundation & Baseline Validation | ✅ COMPLETE |
 | **Phase 2** | Digital Twin & Data Factory | ✅ COMPLETE |
 | **Phase 3** | Advanced FedXAI Framework | ✅ COMPLETE |
-| **Phase 4** | Indian Solution (Edge Deployment) | 🟡 IN PROGRESS (4.1 ✅, 4.2 ✅, 4.3 🔲, 4.4 ) |
+| **Phase 4** | Indian Solution (Edge Deployment) | 🟡 IN PROGRESS (4.1 ✅, 4.2 ✅, 4.3 🔲, 4.4 🔲) |
 
 ---
 
@@ -283,7 +288,7 @@
 | **Data Generation** | Python (NumPy, Pandas) — Physics engine |
 | **Model Training** | TensorFlow / Keras (CNN + LSTM) |
 | **Federated Learning** | Custom Python FL loop (FedAvg + DP + SecAgg) |
-| **XAI** | SHAP (GradientExplainer, Force Plot) |
+| **XAI** | SHAP (GradientExplainer, Force Plot) + LIME (LimeTabularExplainer) |
 | **Model Compression** | TensorFlow Lite (INT8 Quantization) |
 | **Edge Inference** | TensorFlow Lite Micro |
 | **Hardware** | ESP32-S3 / RISC-V SoC + ELM327 OBD-II |

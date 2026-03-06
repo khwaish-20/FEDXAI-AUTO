@@ -18,7 +18,7 @@ FEDXAI-AUTO addresses the challenge of building accurate predictive maintenance 
 
 - **Federated Learning** — vehicles collaboratively train a shared model without sharing raw data
 - **Differential Privacy** — mathematically guaranteed privacy with calibrated DP noise
-- **Explainable AI (XAI)** — SHAP-based explanations translated into mechanic-friendly alerts
+- **Explainable AI (XAI)** — SHAP + LIME dual-method explanations translated into mechanic-friendly alerts
 - **Edge Deployment** — compressed TFLite model running on a ₹1,385 (~$17) OBD-II dongle
 
 ### Key Results
@@ -64,11 +64,14 @@ FEDXAI-AUTO/
 │
 ├── 🧠 Phase 3 — Federated Learning + XAI
 │   ├── federated_training_production.py    # FL training with DP + SecAgg
-│   ├── xai_analysis.py                     # SHAP explainability analysis
+│   ├── xai_analysis.py                     # SHAP + LIME explainability analysis
 │   ├── generate_report.py                  # Model evaluation script
 │   ├── fedxai_production_best.keras        # Best cloud model (98.84%)
-│   ├── shap_summary_plot.png               # Global feature importance
-│   └── shap_force_plot_failure.html        # Interactive failure explanation
+│   ├── shap_summary_plot.png               # SHAP global feature importance
+│   ├── shap_force_plot_failure.html        # SHAP interactive failure explanation
+│   ├── lime_explanation_failure.png        # LIME local explanation (failure)
+│   ├── lime_explanation_healthy.png        # LIME local explanation (healthy)
+│   └── lime_feature_importance.png         # LIME aggregated feature importance
 │
 ├── 🔧 Phase 4 — Edge Deployment
 │   ├── phase4_realistic.py                 # TinyML pipeline (train + convert)
@@ -119,12 +122,13 @@ Python 3.10+
 TensorFlow 2.x
 scikit-learn
 pandas, numpy
-shap
+shap, lime
+matplotlib
 ```
 
 ### Install Dependencies
 ```bash
-pip install tensorflow scikit-learn pandas numpy shap matplotlib
+pip install tensorflow scikit-learn pandas numpy shap lime matplotlib
 ```
 
 ### Run Training Pipeline
@@ -189,7 +193,7 @@ pio run --target upload
 |--------|:---:|:---:|:---:|
 | Accuracy | 98.15% | **98.84%** | +0.69% |
 | Privacy | None | **DP (ε=1.0)** | ✅ Added |
-| Explainability | None | **SHAP + Alerts** | ✅ Added |
+| Explainability | None | **SHAP + LIME + Alerts** | ✅ Added |
 | Edge Deployment | None | **22.6 KB TFLite** | ✅ Added |
 | Cost per Unit | N/A | **₹1,385** | ✅ Practical |
 
