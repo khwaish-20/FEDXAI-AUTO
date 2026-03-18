@@ -11,7 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#020617;color:#e2e8f0;font-family:'Rajdhani',sans-serif;height:100vh;overflow:hidden}
+        body{background:#020617;color:#e2e8f0;font-family:'Rajdhani',sans-serif;height:100vh;overflow:hidden!important}
+        html{overflow:hidden!important}
         .font-hud{font-family:'Orbitron',sans-serif}
         .glass{background:rgba(15,23,42,.55);backdrop-filter:blur(14px);border:1px solid rgba(56,189,248,.12);box-shadow:0 0 24px rgba(0,0,0,.5)}
 
@@ -28,12 +29,17 @@
         .part:hover .ico{color:#38bdf8;transform:scale(1.25)}
         .part:hover .tag{opacity:1;transform:translateY(0)}
 
-        /* Failing state */
-        .part.failing .ico{color:#ef4444!important;animation:pulse-part 1s infinite;filter:drop-shadow(0 0 10px #ef4444)}
+        /* Failing state — uses opacity glow only, NO transform scale to prevent page zoom */
+        .part.failing .ico{color:#ef4444!important;animation:glow-red 1s infinite;filter:drop-shadow(0 0 10px #ef4444)}
         .part.failing .tag{opacity:1;border-color:#ef4444;color:#ef4444;transform:translateY(0)}
-        .part.warning .ico{color:#f59e0b!important;animation:pulse-part 1.5s infinite;filter:drop-shadow(0 0 8px #f59e0b)}
+        .part.warning .ico{color:#f59e0b!important;animation:glow-amber 1.5s infinite;filter:drop-shadow(0 0 8px #f59e0b)}
         .part.warning .tag{opacity:1;border-color:#f59e0b;color:#f59e0b;transform:translateY(0)}
-        @keyframes pulse-part{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+        @keyframes glow-red{0%,100%{opacity:1;filter:drop-shadow(0 0 6px #ef4444)}50%{opacity:.6;filter:drop-shadow(0 0 16px #ef4444)}}
+        @keyframes glow-amber{0%,100%{opacity:1;filter:drop-shadow(0 0 5px #f59e0b)}50%{opacity:.65;filter:drop-shadow(0 0 14px #f59e0b)}}
+
+        /* Override Tailwind animate-pulse to prevent zoom */
+        .no-scale-pulse{animation:opacity-pulse 2s cubic-bezier(.4,0,.6,1) infinite!important}
+        @keyframes opacity-pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
         /* Alert card slide-in */
         .alert-card{animation:slideIn .4s ease-out}
@@ -94,9 +100,10 @@
 
     <!-- LEFT: Risk Gauge -->
     <div class="w-[200px] shrink-0 flex flex-col gap-2">
-        <div class="glass rounded-xl p-4 flex-1 flex flex-col items-center justify-center text-center transition-all duration-500" id="risk-box">
+        <!-- AI Prediction Box -->
+        <div class="glass rounded-xl p-4 h-1/2 flex flex-col items-center justify-center text-center transition-all duration-500" id="risk-box">
             <div class="text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-2">AI PREDICTION</div>
-            <div class="font-hud text-5xl font-black transition-all duration-500" id="risk-val" style="color:#22c55e">0%</div>
+            <div class="font-hud text-4xl font-black transition-all duration-500" id="risk-val" style="color:#22c55e">0%</div>
             <div class="text-[10px] mt-2 px-3 py-1 rounded-full font-bold tracking-wider" id="risk-badge" style="background:#14532d;color:#86efac;border:1px solid #16a34a">
                 HEALTHY
             </div>
@@ -104,7 +111,7 @@
         </div>
 
         <!-- Sensor Quick Readings -->
-        <div class="glass rounded-xl p-3 space-y-3">
+        <div class="glass rounded-xl p-3 h-1/2 flex flex-col justify-center space-y-2">
             <div class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">LIVE SENSORS</div>
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2"><i class="fa-solid fa-gauge-high text-cyan-400 text-xs"></i><span class="text-[10px] text-slate-400">RPM</span></div>
@@ -163,26 +170,33 @@
                     <line x1="100" y1="268" x2="720" y2="268" stroke="#1e293b" stroke-width="1" stroke-dasharray="4,4"/>
                 </svg>
 
-                <!-- Interactive Part Icons -->
-                <div id="p-engine" class="part" style="top:42%;left:28%" onclick="showPartInfo('engine')">
-                    <i class="fa-solid fa-gears ico"></i><span class="tag">ENGINE BLOCK</span>
-                </div>
-                <div id="p-cooling" class="part" style="top:48%;left:12%" onclick="showPartInfo('cooling')">
+                <!-- Interactive Part Icons (car faces RIGHT: front=right, rear=left) -->
+                <!-- Radiator/Cooling: front grille area (right side) -->
+                <div id="p-cooling" class="part" style="top:48%;left:88%" onclick="showPartInfo('cooling')">
                     <i class="fa-solid fa-fan ico"></i><span class="tag">COOLING SYSTEM</span>
                 </div>
-                <div id="p-fuel" class="part" style="top:50%;left:78%" onclick="showPartInfo('fuel')">
-                    <i class="fa-solid fa-gas-pump ico"></i><span class="tag">FUEL PUMP</span>
+                <!-- Engine: under the hood, front-center -->
+                <div id="p-engine" class="part" style="top:35%;left:75%" onclick="showPartInfo('engine')">
+                    <i class="fa-solid fa-gears ico"></i><span class="tag">ENGINE BLOCK</span>
                 </div>
-                <div id="p-catalyst" class="part" style="top:65%;left:55%" onclick="showPartInfo('catalyst')">
-                    <i class="fa-solid fa-fire-burner ico"></i><span class="tag">CATALYST</span>
-                </div>
-                <div id="p-alternator" class="part" style="top:40%;left:38%" onclick="showPartInfo('alternator')">
+                <!-- Alternator: next to engine, slightly behind -->
+                <div id="p-alternator" class="part" style="top:35%;left:62%" onclick="showPartInfo('alternator')">
                     <i class="fa-solid fa-car-battery ico"></i><span class="tag">ALTERNATOR</span>
                 </div>
-                <div id="p-oil" class="part" style="top:68%;left:22%" onclick="showPartInfo('oil')">
+                <!-- Oil Pan: underneath engine, lower position -->
+                <div id="p-oil" class="part" style="top:62%;left:68%" onclick="showPartInfo('oil')">
                     <i class="fa-solid fa-oil-can ico"></i><span class="tag">OIL SYSTEM</span>
                 </div>
-                <div id="p-brakes" class="part" style="top:68%;left:85%" onclick="showPartInfo('brakes')">
+                <!-- Catalyst/Exhaust: underneath center, toward rear -->
+                <div id="p-catalyst" class="part" style="top:62%;left:45%" onclick="showPartInfo('catalyst')">
+                    <i class="fa-solid fa-fire-burner ico"></i><span class="tag">CATALYST</span>
+                </div>
+                <!-- Fuel Tank/Pump: rear of car (left side) -->
+                <div id="p-fuel" class="part" style="top:48%;left:15%" onclick="showPartInfo('fuel')">
+                    <i class="fa-solid fa-gas-pump ico"></i><span class="tag">FUEL PUMP</span>
+                </div>
+                <!-- Brakes: at rear wheel area -->
+                <div id="p-brakes" class="part" style="top:68%;left:22%" onclick="showPartInfo('brakes')">
                     <i class="fa-solid fa-compact-disc ico"></i><span class="tag">BRAKE SYSTEM</span>
                 </div>
             </div>
@@ -424,7 +438,7 @@ function setRisk(pct, status) {
     if (status === 'critical') {
         el.style.color = '#ef4444';
         badge.textContent = 'CRITICAL';
-        badge.className = 'text-[10px] mt-2 px-3 py-1 rounded-full font-bold tracking-wider badge-critical animate-pulse';
+        badge.className = 'text-[10px] mt-2 px-3 py-1 rounded-full font-bold tracking-wider badge-critical no-scale-pulse';
         box.style.borderLeft = '4px solid #ef4444';
         box.style.background = 'rgba(127,29,29,.15)';
     } else if (status === 'warning') {
