@@ -1,0 +1,46 @@
+============================================================
+  FEDXAI-AUTO FINAL MODEL VERIFICATION
+============================================================
+
+[1] MODEL FILES:
+  [+] Keras Cloud: 127.5KB
+  [+] Keras Prod: 456.0KB
+  [+] TFLite Edge: 31.2KB
+  [+] TFLite INT8: 21.0KB
+  [+] ESP32 Header: 193.3KB
+  [+] Firmware: 21.2KB
+
+[2] KERAS MODEL:
+  Input:(None, 20, 8) Output:(None, 1) Params:5,857
+
+[3] DATA:
+  Rows:30180 H:14530 F:15650
+  Test:6032 seqs
+
+[4] KERAS ACCURACY:
+  Accuracy:  36.32%
+  Precision: 41.0%
+  Recall:    69.7%
+  F1-Score:  51.6%
+  CM: H[145,2950] F[891,2046]
+  Speed: 0.334ms/sample
+
+[5] TFLITE EDGE:
+  Size:31.2KB Input:[ 1 20  8]
+  TFLite Acc: 45.40% (500 samples)
+  Speed: 0.039ms/sample
+  K-vs-TFL diff: 0.000000
+
+[6] XAI FILES:
+  [+] shap_summary_plot.png
+  [+] shap_force_plot_failure.html
+  [+] lime_explanation_failure.png
+  [+] lime_explanation_healthy.png
+  [+] lime_feature_importance.png
+
+============================================================
+  VERDICT
+============================================================
+  Keras:  36.32%  TFLite: 45.40%  Size: 31.2KB  F1: 51.6%
+  >>> NEEDS RETRAINING <<<
+============================================================

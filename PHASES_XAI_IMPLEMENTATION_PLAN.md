@@ -217,7 +217,7 @@
 | **Edge Inference** | Real-time prediction: "Healthy" or "Failure Imminent" |
 | **Local Fine-Tuning** | Periodically re-trains the last dense layers on local driving data (pFL on-device) |
 | **Local Alert Gen** | SHAP-based translation: sensor contributions → human-readable diagnosis |
-| **Mobile App** | Receives alerts via Bluetooth/WiFi → displays: `"Check Fuel Filter"`, `"Coolant System Warning"` |
+| **Mobile App** | Receives alerts  `"Check Fuel Filter"`, `"Coolant System Warning"` |
 
 ### Step 4.4: Web Dashboard Interface (PWA)
 | Item | Detail |
