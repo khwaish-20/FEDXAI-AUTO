@@ -961,6 +961,10 @@
         let ecoScore = 100;
         let activeAlertData = null;
         
+        // --- API Integration ---
+        // Get your free key at: https://openrouteservice.org/
+        const ORS_API_KEY = 'ENTER_YOUR_FREE_ORS_API_KEY_HERE';
+        
         // Data arrays for charts
         const maxDataPoints = 20;
         let rpmData = new Array(maxDataPoints).fill(750);
@@ -1024,30 +1028,53 @@
             }
         }
         
-        function triggerMechanicRouting() {
-            // Mechanic Shop at slightly offset coordinates
+        async function triggerMechanicRouting() {
+            // Simulated Mechanic Shop (Using actual city coordinates slightly offset)
+            // Real implementation would use Google Places API to find nearest "Auto Repair"
             const mechLat = currLat + 0.005;
             const mechLng = currLng + 0.008;
             
-            // Mechanic Marker
+            // Draw Mechanic Marker
             const mechHtml = "<div style='width: 14px; height: 14px; background: #ff0040; border-radius: 50%; box-shadow: 0 0 15px #ff0040, 0 0 30px #ff0040; border: 2px solid #fff;'></div>";
             const mechIcon = L.divIcon({ className: 'custom-div-icon', html: mechHtml, iconSize: [14, 14], iconAnchor: [7, 7] });
-            L.marker([mechLat, mechLng], {icon: mechIcon}).addTo(map).bindPopup("<div class='font-orbitron font-bold text-neon-red mb-1 text-sm'>CERTIFIED MECHANIC</div><div class='font-rajdhani text-gray-800 text-xs'>Immediate Service Available.<br>ETA: 4 minutes.</div>", {autoClose: false, closeOnClick: false}).openPopup();
+            L.marker([mechLat, mechLng], {icon: mechIcon}).addTo(map).bindPopup("<div class='font-orbitron font-bold text-neon-red mb-1 text-sm'>CERTIFIED MECHANIC</div><div class='font-rajdhani text-gray-800 text-xs'>Immediate Service Available.<br>ETA: Calculating...</div>", {autoClose: false, closeOnClick: false}).openPopup();
             
-            // Route Line
-            const latlngs = [
-                [currLat, currLng],
-                [currLat + 0.002, currLng],
-                [currLat + 0.002, currLng + 0.005],
-                [mechLat, currLng + 0.005],
-                [mechLat, mechLng]
-            ];
-            
-            if (routingLine) map.removeLayer(routingLine);
-            routingLine = L.polyline(latlngs, {color: '#ff0040', weight: 4, opacity: 0.8, dashArray: '10, 10'}).addTo(map);
-            
-            // Add a slight movement to standard map
-            map.flyToBounds(routingLine.getBounds(), {padding: [50, 50], duration: 2});
+            // If API key is missing, use fallback straight-line math
+            if (ORS_API_KEY === 'ENTER_YOUR_FREE_ORS_API_KEY_HERE') {
+                console.warn("OpenRouteService API Key is missing. Falling back to straight-line math.");
+                const latlngs = [[currLat, currLng], [mechLat, mechLng]];
+                if (routingLine) map.removeLayer(routingLine);
+                routingLine = L.polyline(latlngs, {color: '#ff0040', weight: 4, opacity: 0.8, dashArray: '10, 10'}).addTo(map);
+                map.flyToBounds(routingLine.getBounds(), {padding: [50, 50], duration: 2});
+                return;
+            }
+
+            try {
+                // Call OpenRouteService Directions API
+                // Note: ORS uses [longitude, latitude] for coordinates instead of Leaflet's [lat, lng]
+                addLogEntry('[API] Fetching real street routing via OpenRouteService...', 'info');
+                const response = await fetch(`https://api.openrouteservice.org/v2/directions/driving-car?api_key=${ORS_API_KEY}&start=${currLng},${currLat}&end=${mechLng},${mechLat}`);
+                const data = await response.json();
+
+                if (data.features && data.features.length > 0) {
+                    addLogEntry('[API] Route found successfully.', 'success');
+                    
+                    // Extract GeoJSON geometry coordinates
+                    const coords = data.features[0].geometry.coordinates;
+                    
+                    // Convert ORS [lng, lat] back to Leaflet [lat, lng]
+                    const latlngs = coords.map(c => [c[1], c[0]]);
+
+                    if (routingLine) map.removeLayer(routingLine);
+                    routingLine = L.polyline(latlngs, {color: '#ff0040', weight: 5, opacity: 0.9}).addTo(map);
+                    
+                    // Animate map view to perfectly fit the new street route
+                    map.flyToBounds(routingLine.getBounds(), {padding: [50, 50], duration: 2.5});
+                }
+            } catch (error) {
+                console.error("Routing Error: ", error);
+                addLogEntry('[API] Routing failed, using straight-line fallback.', 'error');
+            }
         }
 
         // ============================================
