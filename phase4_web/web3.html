@@ -732,19 +732,21 @@
             <!-- Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- RPM Chart -->
-                <div class="chart-container">
-                    <div class="flex items-center justify-between mb-4">
+                <div class="chart-container flex flex-col h-[350px]">
+                    <div class="flex items-center justify-between mb-4 shrink-0">
                         <h3 class="font-orbitron text-lg font-bold text-white">
                             <i class="fas fa-chart-line text-neon-blue mr-2"></i>RPM vs Time
                         </h3>
                         <span class="text-neon-blue text-sm font-rajdhani">LIVE</span>
                     </div>
-                    <canvas id="rpmChart" height="200"></canvas>
+                    <div class="relative flex-1 w-full max-h-[300px]">
+                        <canvas id="rpmChart"></canvas>
+                    </div>
                 </div>
                 
                 <!-- Fuel Pressure & Trim Chart -->
-                <div class="chart-container">
-                    <div class="flex items-center justify-between mb-4">
+                <div class="chart-container flex flex-col h-[350px]">
+                    <div class="flex items-center justify-between mb-4 shrink-0">
                         <h3 class="font-orbitron text-lg font-bold text-white">
                             <i class="fas fa-chart-area text-neon-blue mr-2"></i>Fuel Metrics
                         </h3>
@@ -753,7 +755,9 @@
                             <span class="text-neon-red">● Trim</span>
                         </div>
                     </div>
-                    <canvas id="fuelChart" height="200"></canvas>
+                    <div class="relative flex-1 w-full max-h-[300px]">
+                        <canvas id="fuelChart"></canvas>
+                    </div>
                 </div>
             </div>
             
