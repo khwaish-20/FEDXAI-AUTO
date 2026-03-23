@@ -987,6 +987,41 @@
             const carIconHtml = "<div style='width: 14px; height: 14px; background: #00f0ff; border-radius: 50%; box-shadow: 0 0 15px #00f0ff, 0 0 30px #00f0ff; border: 2px solid #fff;'></div>";
             const carIconDiv = L.divIcon({ className: 'custom-div-icon', html: carIconHtml, iconSize: [14, 14], iconAnchor: [7, 7] });
             carMarker = L.marker([currLat, currLng], {icon: carIconDiv}).addTo(map);
+            
+            // Setup HTML5 Geolocation Tracking
+            if ('geolocation' in navigator) {
+                // Get initial position quickly
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => updateRealLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.heading),
+                    (err) => console.log("GPS Location Error:", err),
+                    { enableHighAccuracy: true }
+                );
+                
+                // Track continuous movement
+                navigator.geolocation.watchPosition(
+                    (pos) => updateRealLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.heading),
+                    (err) => console.log("GPS Watch Error:", err),
+                    { enableHighAccuracy: true, maximumAge: 5000, timeout: 5000 }
+                );
+            }
+        }
+        
+        function updateRealLocation(lat, lng, heading) {
+            currLat = lat;
+            currLng = lng;
+            
+            // Move map to actual user location
+            map.flyTo([lat, lng], 16, {animate: true, duration: 1.5});
+            carMarker.setLatLng([lat, lng]);
+            
+            // Update UI text (Location & Heading)
+            document.getElementById('gps-coords').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            
+            if (heading !== null && !isNaN(heading)) {
+                document.getElementById('gps-heading').textContent = `${Math.round(heading)}°`;
+            } else {
+                document.getElementById('gps-heading').textContent = "STATIONARY";
+            }
         }
         
         function triggerMechanicRouting() {
