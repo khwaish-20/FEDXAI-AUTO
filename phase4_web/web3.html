@@ -423,11 +423,11 @@
             <a href="#diagnostics" class="ble-btn !py-2 !px-4 text-xs tracking-widest" style="text-decoration: none;">
                 <i class="fas fa-car mr-1"></i> DIAGNOSTICS
             </a>
-            <a href="#location" class="ble-btn !py-2 !px-4 text-xs tracking-widest" style="text-decoration: none;">
-                <i class="fas fa-map-location-dot mr-1"></i> GPS
-            </a>
             <a href="#telemetry" class="ble-btn !py-2 !px-4 text-xs tracking-widest" style="text-decoration: none;">
                 <i class="fas fa-chart-line mr-1"></i> TELEMETRY
+            </a>
+            <a href="#location" class="ble-btn !py-2 !px-4 text-xs tracking-widest" style="text-decoration: none;">
+                <i class="fas fa-map-location-dot mr-1"></i> GPS
             </a>
             <a href="#analytics" class="ble-btn !py-2 !px-4 text-xs tracking-widest" style="text-decoration: none;">
                 <i class="fas fa-history mr-1"></i> LOGBOOK
@@ -654,37 +654,7 @@
         </div>
     </section>
 
-    <!-- Section Divider -->
-    <div class="section-divider"></div>
 
-    <!-- SECTION 2.5: LIVE GPS TRACKING -->
-    <section id="location" class="py-20 px-4 md:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-12">
-                <h2 class="font-orbitron text-4xl md:text-5xl font-bold mb-4">
-                    <span class="text-white">LIVE </span>
-                    <span class="text-neon-blue">TRACKING</span>
-                </h2>
-                <p class="text-gray-400 font-rajdhani text-lg">Real-time GPS positioning & Mechanic routing</p>
-            </div>
-            
-            <div class="glass-panel rounded-xl overflow-hidden relative" style="height: 450px;">
-                <!-- Map Overlay Glass blur for HUD effect -->
-                <div class="absolute inset-0 pointer-events-none z-[400] shadow-[inset_0_0_50px_rgba(0,0,0,0.8)]"></div>
-                <div id="map" class="w-full h-full z-10" style="background:#0a0a0f;"></div>
-                
-                <!-- Overlay Stats -->
-                <div class="absolute top-4 left-4 z-[500] glass-panel p-4 rounded-lg">
-                    <div class="text-neon-blue font-orbitron text-xs font-bold tracking-widest mb-2"><i class="fas fa-satellite mr-2"></i>GPS Lock: 12 Sats</div>
-                    <div class="text-white font-rajdhani text-sm">Lat/Lng: <span id="gps-coords">37.7749, -122.4194</span></div>
-                    <div class="text-gray-400 font-rajdhani text-sm">Heading: <span id="gps-heading">NNE 24°</span></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section Divider -->
-    <div class="section-divider"></div>
 
     <!-- SECTION 3: LIVE TELEMETRY DASHBOARD -->
     <section id="telemetry" class="min-h-screen py-20 px-4 md:px-8">
@@ -824,6 +794,35 @@
                     <div class="text-gray-500">[INFO] Waiting for OBD-II connection...</div>
                     <div class="text-gray-500">[INFO] Web Bluetooth API detected</div>
                     <div class="text-neon-blue">[READY] System ready for diagnostics</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider"></div>
+
+    <!-- SECTION 3.5: LIVE GPS TRACKING -->
+    <section id="location" class="py-20 px-4 md:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="font-orbitron text-4xl md:text-5xl font-bold mb-4">
+                    <span class="text-white">LIVE </span>
+                    <span class="text-neon-blue">TRACKING</span>
+                </h2>
+                <p class="text-gray-400 font-rajdhani text-lg">Real-time GPS positioning & Mechanic routing</p>
+            </div>
+            
+            <div class="glass-panel rounded-xl overflow-hidden relative" style="height: 450px;">
+                <!-- Map Overlay Glass blur for HUD effect -->
+                <div class="absolute inset-0 pointer-events-none z-[400] shadow-[inset_0_0_50px_rgba(0,0,0,0.8)]"></div>
+                <div id="map" class="w-full h-full z-10" style="background:#0a0a0f;"></div>
+                
+                <!-- Overlay Stats -->
+                <div class="absolute top-4 left-4 z-[500] glass-panel p-4 rounded-lg">
+                    <div class="text-neon-blue font-orbitron text-xs font-bold tracking-widest mb-2"><i class="fas fa-satellite mr-2"></i>GPS Lock: 12 Sats</div>
+                    <div class="text-white font-rajdhani text-sm">Lat/Lng: <span id="gps-coords">37.7749, -122.4194</span></div>
+                    <div class="text-gray-400 font-rajdhani text-sm">Heading: <span id="gps-heading">NNE 24°</span></div>
                 </div>
             </div>
         </div>
