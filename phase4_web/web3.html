@@ -989,8 +989,8 @@
                 updateGauges(rpm, fuelPressure, fuelTrim);
                 updateCharts(rpm, fuelPressure, fuelTrim);
                 
-                // Trigger failure at 3 seconds
-                if (elapsedTime >= 3000) {
+                // Trigger failure at 3 seconds (once)
+                if (elapsedTime === 3000) {
                     triggerFuelPumpFailure();
                 }
                 
