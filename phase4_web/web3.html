@@ -440,11 +440,7 @@
             </p>
         </div>
         
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce-slow">
-            <span class="text-neon-blue text-sm font-rajdhani tracking-widest mb-2">SCROLL FOR DIAGNOSTICS</span>
-            <i class="fas fa-chevron-down text-neon-blue text-2xl"></i>
-        </div>
+
     </section>
 
     <!-- Section Divider -->
@@ -808,11 +804,11 @@
         let isBluetoothConnected = false;
         
         // Data arrays for charts
-        const maxDataPoints = 30;
+        const maxDataPoints = 20;
         let rpmData = new Array(maxDataPoints).fill(750);
         let fuelPressureData = new Array(maxDataPoints).fill(350);
         let fuelTrimData = new Array(maxDataPoints).fill(2.5);
-        let timeLabels = new Array(maxDataPoints).fill('').map((_, i) => `-${maxDataPoints - i}s`);
+        let timeLabels = new Array(maxDataPoints).fill('').map((_, i) => `-${maxDataPoints - i}`);
         
         // ============================================
         // CHART INITIALIZATION
@@ -856,9 +852,7 @@
                         tension: 0.4
                     }
                 },
-                animation: {
-                    duration: 300
-                }
+                animation: false
             };
             
             // RPM Chart
@@ -975,7 +969,7 @@
             // Simulate normal operation for 3 seconds
             let elapsedTime = 0;
             demoInterval = setInterval(() => {
-                elapsedTime += 100;
+                elapsedTime += 250;
                 
                 // Normal fluctuation
                 const rpm = 700 + Math.random() * 100;
@@ -994,7 +988,7 @@
                 if (elapsedTime >= 10000) {
                     stopDemo();
                 }
-            }, 100);
+            }, 250);
         }
         
         function triggerFuelPumpFailure() {
@@ -1025,7 +1019,7 @@
             // Simulate failure data
             let failureTime = 0;
             const failureInterval = setInterval(() => {
-                failureTime += 100;
+                failureTime += 250;
                 
                 // Rapid pressure drop and trim spike
                 const currentPressure = 350 - (failureTime / 50);
@@ -1041,7 +1035,7 @@
                 if (failureTime >= 3000) {
                     clearInterval(failureInterval);
                 }
-            }, 100);
+            }, 250);
         }
         
         function stopDemo() {
