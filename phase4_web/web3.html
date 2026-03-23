@@ -14,6 +14,10 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Leaflet JS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -419,8 +423,14 @@
             <a href="#diagnostics" class="ble-btn !py-2 !px-4 text-xs tracking-widest" style="text-decoration: none;">
                 <i class="fas fa-car mr-1"></i> DIAGNOSTICS
             </a>
+            <a href="#location" class="ble-btn !py-2 !px-4 text-xs tracking-widest" style="text-decoration: none;">
+                <i class="fas fa-map-location-dot mr-1"></i> GPS
+            </a>
             <a href="#telemetry" class="ble-btn !py-2 !px-4 text-xs tracking-widest" style="text-decoration: none;">
                 <i class="fas fa-chart-line mr-1"></i> TELEMETRY
+            </a>
+            <a href="#analytics" class="ble-btn !py-2 !px-4 text-xs tracking-widest" style="text-decoration: none;">
+                <i class="fas fa-history mr-1"></i> LOGBOOK
             </a>
         </nav>
 
@@ -647,6 +657,35 @@
     <!-- Section Divider -->
     <div class="section-divider"></div>
 
+    <!-- SECTION 2.5: LIVE GPS TRACKING -->
+    <section id="location" class="py-20 px-4 md:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="font-orbitron text-4xl md:text-5xl font-bold mb-4">
+                    <span class="text-white">LIVE </span>
+                    <span class="text-neon-blue">TRACKING</span>
+                </h2>
+                <p class="text-gray-400 font-rajdhani text-lg">Real-time GPS positioning & Mechanic routing</p>
+            </div>
+            
+            <div class="glass-panel rounded-xl overflow-hidden relative" style="height: 450px;">
+                <!-- Map Overlay Glass blur for HUD effect -->
+                <div class="absolute inset-0 pointer-events-none z-[400] shadow-[inset_0_0_50px_rgba(0,0,0,0.8)]"></div>
+                <div id="map" class="w-full h-full z-10" style="background:#0a0a0f;"></div>
+                
+                <!-- Overlay Stats -->
+                <div class="absolute top-4 left-4 z-[500] glass-panel p-4 rounded-lg">
+                    <div class="text-neon-blue font-orbitron text-xs font-bold tracking-widest mb-2"><i class="fas fa-satellite mr-2"></i>GPS Lock: 12 Sats</div>
+                    <div class="text-white font-rajdhani text-sm">Lat/Lng: <span id="gps-coords">37.7749, -122.4194</span></div>
+                    <div class="text-gray-400 font-rajdhani text-sm">Heading: <span id="gps-heading">NNE 24°</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider"></div>
+
     <!-- SECTION 3: LIVE TELEMETRY DASHBOARD -->
     <section id="telemetry" class="min-h-screen py-20 px-4 md:px-8">
         <div class="max-w-7xl mx-auto">
@@ -684,7 +723,25 @@
             </div>
             
             <!-- Digital Gauges Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Eco Score Gauge -->
+                <div class="gauge-card relative">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 font-rajdhani text-sm tracking-wider">ECO SCORE</span>
+                        <i class="fas fa-leaf text-neon-green"></i>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <div id="ecoScoreValue" class="font-orbitron text-4xl font-bold text-neon-green transition-colors duration-300">100</div>
+                        <div class="text-gray-500 text-sm font-rajdhani mb-1">/ 100 pt</div>
+                    </div>
+                    <div class="mt-4 text-[11px] text-gray-400 font-rajdhani h-4 italic overflow-hidden" id="ecoTips">
+                        Optimal cruising efficiency. Wear mitigated.
+                    </div>
+                    <div class="mt-4 h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div id="ecoScoreBar" class="h-full bg-gradient-to-r from-green-600 to-neon-green transition-all duration-300" style="width: 100%;"></div>
+                    </div>
+                </div>
+                
                 <!-- RPM Gauge -->
                 <div class="gauge-card">
                     <div class="flex items-center justify-between mb-4">
@@ -772,6 +829,88 @@
         </div>
     </section>
 
+    <!-- Section Divider -->
+    <div class="section-divider"></div>
+
+    <!-- SECTION 4: HISTORICAL LOGBOOK & ANALYTICS -->
+    <section id="analytics" class="py-20 px-4 md:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="font-orbitron text-4xl md:text-5xl font-bold mb-4">
+                    <span class="text-white">SERVICE </span>
+                    <span class="text-neon-blue">HUB</span>
+                </h2>
+                <p class="text-gray-400 font-rajdhani text-lg">Predictive Scheduling & Maintenance Logs</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Predictive Scheduling -->
+                <div class="glass-panel p-6 rounded-xl col-span-1">
+                    <h3 class="font-orbitron text-lg font-bold text-white mb-6">
+                        <i class="fas fa-calendar-check text-neon-blue mr-2"></i>PREDICTIVE WEAR
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between text-sm font-rajdhani mb-2">
+                                <span class="text-gray-300">Brake Pads</span>
+                                <span class="text-yellow-400">450 km left</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-800 rounded-full">
+                                <div class="h-full bg-yellow-400 rounded-full shadow-[0_0_10px_#facc15]" style="width: 15%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-rajdhani mb-2">
+                                <span class="text-gray-300">Oil Viscosity</span>
+                                <span class="text-neon-green">22% life</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-800 rounded-full">
+                                <div class="h-full bg-neon-green rounded-full shadow-[0_0_10px_#00ff88]" style="width: 22%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-rajdhani mb-2">
+                                <span class="text-gray-300">Fuel Filter </span>
+                                <span id="fw-label" class="text-neon-blue font-bold">1200 km left</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-800 rounded-full">
+                                <div id="fw-bar" class="h-full bg-neon-blue rounded-full shadow-[0_0_10px_#00f0ff] transition-all duration-1000" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Maintenance History Table -->
+                <div class="glass-panel p-6 rounded-xl col-span-1 lg:col-span-2">
+                    <h3 class="font-orbitron text-lg font-bold text-white mb-4">
+                        <i class="fas fa-history text-neon-blue mr-2"></i>AI EVENT LOGBOOK
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left font-rajdhani">
+                            <thead>
+                                <tr class="border-b border-gray-800 text-gray-500 text-xs tracking-widest uppercase">
+                                    <th class="py-3 px-2">Date / Time</th>
+                                    <th class="py-3 px-2">Component</th>
+                                    <th class="py-3 px-2">AI Diagnosis</th>
+                                    <th class="py-3 px-2 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logbookTableBody" class="text-gray-300 text-sm">
+                                <!-- Logbook items injected by JS -->
+                            </tbody>
+                        </table>
+                        <div id="emptyLogbookMessage" class="text-center py-6 text-gray-600">
+                            <i class="fas fa-check-circle text-2xl mb-2 opacity-30 mt-4"></i>
+                            <p>No critical faults logged in this session.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="py-8 text-center border-t border-gray-800">
         <p class="text-gray-500 font-rajdhani">
@@ -813,6 +952,16 @@
         let rpmChart, fuelChart;
         let isBluetoothConnected = false;
         
+        // Advanced Features State
+        let mapInitialized = false;
+        let map;
+        let carMarker;
+        let routingLine;
+        let currLat = 37.7749;
+        let currLng = -122.4194;
+        let ecoScore = 100;
+        let activeAlertData = null;
+        
         // Data arrays for charts
         const maxDataPoints = 20;
         let rpmData = new Array(maxDataPoints).fill(750);
@@ -820,6 +969,53 @@
         let fuelTrimData = new Array(maxDataPoints).fill(2.5);
         let timeLabels = new Array(maxDataPoints).fill('').map((_, i) => `-${maxDataPoints - i}`);
         
+        // ============================================
+        // MAP INITIALIZATION
+        // ============================================
+        function initMap() {
+            if (mapInitialized) return;
+            mapInitialized = true;
+            
+            // CARTO Dark Matter tile layer for the premium dark theme
+            map = L.map('map', {zoomControl: false, scrollWheelZoom: false, doubleClickZoom: false}).setView([currLat, currLng], 15);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+            
+            // Glowing Car Marker
+            const carIconHtml = "<div style='width: 14px; height: 14px; background: #00f0ff; border-radius: 50%; box-shadow: 0 0 15px #00f0ff, 0 0 30px #00f0ff; border: 2px solid #fff;'></div>";
+            const carIconDiv = L.divIcon({ className: 'custom-div-icon', html: carIconHtml, iconSize: [14, 14], iconAnchor: [7, 7] });
+            carMarker = L.marker([currLat, currLng], {icon: carIconDiv}).addTo(map);
+        }
+        
+        function triggerMechanicRouting() {
+            // Mechanic Shop at slightly offset coordinates
+            const mechLat = currLat + 0.005;
+            const mechLng = currLng + 0.008;
+            
+            // Mechanic Marker
+            const mechHtml = "<div style='width: 14px; height: 14px; background: #ff0040; border-radius: 50%; box-shadow: 0 0 15px #ff0040, 0 0 30px #ff0040; border: 2px solid #fff;'></div>";
+            const mechIcon = L.divIcon({ className: 'custom-div-icon', html: mechHtml, iconSize: [14, 14], iconAnchor: [7, 7] });
+            L.marker([mechLat, mechLng], {icon: mechIcon}).addTo(map).bindPopup("<div class='font-orbitron font-bold text-neon-red mb-1 text-sm'>CERTIFIED MECHANIC</div><div class='font-rajdhani text-gray-800 text-xs'>Immediate Service Available.<br>ETA: 4 minutes.</div>", {autoClose: false, closeOnClick: false}).openPopup();
+            
+            // Route Line
+            const latlngs = [
+                [currLat, currLng],
+                [currLat + 0.002, currLng],
+                [currLat + 0.002, currLng + 0.005],
+                [mechLat, currLng + 0.005],
+                [mechLat, mechLng]
+            ];
+            
+            if (routingLine) map.removeLayer(routingLine);
+            routingLine = L.polyline(latlngs, {color: '#ff0040', weight: 4, opacity: 0.8, dashArray: '10, 10'}).addTo(map);
+            
+            // Add a slight movement to standard map
+            map.flyToBounds(routingLine.getBounds(), {padding: [50, 50], duration: 2});
+        }
+
         // ============================================
         // CHART INITIALIZATION
         // ============================================
@@ -986,8 +1182,13 @@
                 const fuelPressure = 340 + Math.random() * 20;
                 const fuelTrim = 2 + Math.random() * 1;
                 
+                // Eco Score Logic (Normal Cruising = slowly recover)
+                if (ecoScore < 100) ecoScore += 0.5;
+                if (ecoScore > 100) ecoScore = 100;
+                
                 updateGauges(rpm, fuelPressure, fuelTrim);
                 updateCharts(rpm, fuelPressure, fuelTrim);
+                updateEcoScore();
                 
                 // Trigger failure at 3 seconds (once)
                 if (elapsedTime === 3000) {
@@ -1026,6 +1227,20 @@
             addLogEntry('[ALERT] Fuel pump degradation detected!', 'error');
             addLogEntry('[XAI] Pressure drop + Trim increase pattern identified', 'warning');
             
+            // Route Map to mechanic
+            triggerMechanicRouting();
+            
+            // Store active alert data for the logbook
+            activeAlertData = {
+                component: 'Fuel Pump system',
+                diagnosis: 'Mechanical degradation detected via Fuel Trim compensation (98% confidence)'
+            };
+            
+            // Update Predictive Scheduling bar visual 
+            document.getElementById('fw-label').innerHTML = '<span class="text-neon-red">IMMEDIATE REPLACEMENT REQUIRED</span>';
+            document.getElementById('fw-bar').style.width = '0%';
+            document.getElementById('fw-bar').className = 'h-full bg-neon-red rounded-full shadow-[0_0_10px_#ff0040] transition-all duration-1000';
+            
             // Simulate failure data
             let failureTime = 0;
             const failureInterval = setInterval(() => {
@@ -1039,8 +1254,13 @@
                 const fuelPressure = Math.max(180, currentPressure);
                 const fuelTrim = Math.min(25, currentTrim);
                 
+                // Fuel Delivery Failure directly drains Eco Score due to rich/lean imbalance
+                ecoScore -= 2.5; 
+                if (ecoScore < 35) ecoScore = 35; // Bottom out at 35 during this demo
+                
                 updateGauges(rpm, fuelPressure, fuelTrim);
                 updateCharts(rpm, fuelPressure, fuelTrim);
+                updateEcoScore();
                 
                 if (failureTime >= 3000) {
                     clearInterval(failureInterval);
@@ -1072,8 +1292,64 @@
         
         function closeAlert() {
             document.getElementById('alertOverlay').classList.remove('active');
+            
+            // Log the acknowledged alert to the Historical Logbook
+            if (activeAlertData) {
+                logMaintenanceEvent(activeAlertData.component, activeAlertData.diagnosis);
+                activeAlertData = null; // Clear it out pending next alert
+            }
         }
         
+        // ============================================
+        // ADVANCED UI UPDATES
+        // ============================================
+        function updateEcoScore() {
+            const scoreEl = document.getElementById('ecoScoreValue');
+            const barEl = document.getElementById('ecoScoreBar');
+            const tipsEl = document.getElementById('ecoTips');
+            
+            let roundedScore = Math.floor(ecoScore);
+            scoreEl.textContent = roundedScore;
+            barEl.style.width = `${roundedScore}%`;
+            
+            // Color changing logic
+            if (roundedScore > 80) {
+                scoreEl.className = "font-orbitron text-4xl font-bold text-neon-green transition-colors duration-300";
+                barEl.className = "h-full bg-gradient-to-r from-green-600 to-neon-green transition-all duration-300";
+                tipsEl.innerHTML = "Optimal cruising efficiency. Wear mitigated.";
+            } else if (roundedScore > 50) {
+                scoreEl.className = "font-orbitron text-4xl font-bold text-yellow-500 transition-colors duration-300";
+                barEl.className = "h-full bg-gradient-to-r from-yellow-600 to-yellow-500 transition-all duration-300";
+                tipsEl.innerHTML = "<span class='text-yellow-500'>Warning:</span> Fuel delivery variance detected. Smooth acceleration advised.";
+            } else {
+                scoreEl.className = "font-orbitron text-4xl font-bold text-neon-red transition-colors duration-300";
+                barEl.className = "h-full bg-gradient-to-r from-red-600 to-neon-red transition-all duration-300";
+                tipsEl.innerHTML = "<span class='text-neon-red'>Critical:</span> Mechanical failure forcing extreme inefficiency. Immediate service required.";
+            }
+        }
+        
+        function logMaintenanceEvent(component, diagnosis) {
+            const tbody = document.getElementById('logbookTableBody');
+            const emptyMsg = document.getElementById('emptyLogbookMessage');
+            
+            emptyMsg.classList.add('hidden');
+            
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-gray-800/50 hover:bg-white/5 transition-colors";
+            tr.innerHTML = `
+                <td class="py-3 px-2">${timeStr}</td>
+                <td class="py-3 px-2 font-bold text-neon-blue">${component}</td>
+                <td class="py-3 px-2 text-gray-400">${diagnosis}</td>
+                <td class="py-3 px-2 text-right"><span class="bg-gray-800 text-green-400 px-2 py-1 rounded text-xs border border-green-900">RESOLVED</span></td>
+            `;
+            
+            // Add to top of list
+            tbody.insertBefore(tr, tbody.firstChild);
+        }
+
         // ============================================
         // GAUGE & CHART UPDATES
         // ============================================
@@ -1186,6 +1462,8 @@
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
             initCharts();
+            initMap();
+            updateEcoScore();
             
             // Check Bluetooth API availability
             if (!navigator.bluetooth) {
@@ -1201,8 +1479,12 @@
                     const fuelPressure = 340 + Math.random() * 20;
                     const fuelTrim = 2 + Math.random() * 1;
                     
+                    if (ecoScore < 100) ecoScore += 0.2;
+                    if (ecoScore > 100) ecoScore = 100;
+                    
                     updateGauges(rpm, fuelPressure, fuelTrim);
                     updateCharts(rpm, fuelPressure, fuelTrim);
+                    updateEcoScore();
                 }
             }, 1000);
         });
