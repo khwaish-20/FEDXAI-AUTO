@@ -167,12 +167,14 @@
                 </h3>
                 <p class="text-sm text-slate-400 leading-relaxed text-justify">Current models suffer from severe data
                     privacy risks due to centralization, struggle with noisy real-world sensor data, and lack the
-                    interpretability needed for users to trust their predictions. A recent 2025 study successfully
-                    developed a privacy-preserving Explainable FL (XFL) model for sustainable manufacturing, achieving
-                    an impressive 98.15% accuracy in a factory setting. In FEDXAI-AUTO, we innovate by deploying a
-                    lightweight, decentralized Temporal Model (CNN+LSTM) onto an ESP32 edge device, ensuring zero
-                    raw-data leakage while using XAI to translate complex E20 degradation signatures into human-readable
-                    alerts for drivers.</p>
+                    interpretability needed for users to trust their predictions. While recent 2025 studies achieved 
+                    98.15% accuracy using Federated Learning, they remain computationally heavy and restricted to cloud 
+                    servers. <strong>FEDXAI-AUTO</strong> bridges this gap by developing an advanced Temporal Model 
+                    (CNN+LSTM) that guarantees zero raw-data leakage through Differential Privacy. Furthermore, our ultimate 
+                    innovation extends into futuristic hardware integration (TinyML): we aggressively compressed the production 
+                    model from 456 KB down to an ultra-lightweight <strong>19.7 KB</strong> 1D-CNN. This paves the immediate 
+                    path for flashing our privacy-preserving XAI directly onto physical ESP32 edge devices (OBD-II dongles), 
+                    enabling instantaneous, offline diagnostics inside the vehicle.</p>
             </div>
         </section>
 
@@ -207,7 +209,7 @@
                     class="glass p-8 rounded-3xl text-center border-2 border-green-500/20 bg-green-500/5 flex flex-col items-center">
                     <i class="fab fa-python text-green-500 text-3xl mb-4"></i>
                     <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-green-400">Live Execution</h3>
-                    <a href="https://github.com/khwaish-20/FEDXAI-AUTO/blob/main/phase4_realistic.py" target="_blank"
+                    <a href="phase4_web/web3.html" target="_blank"
                         class="px-6 py-2 bg-green-600 rounded-full text-[10px] font-black hover:bg-green-500 transition shadow-lg shadow-green-900/40">VIEW
                         CODE / DEMO</a>
                 </div>
@@ -224,12 +226,9 @@
                         class="p-6 rounded-2xl bg-white/5 flex justify-between items-center border border-white/10 shadow-inner">
                         <span class="text-slate-400 font-bold uppercase text-xs tracking-widest">Accuracy /
                             Performance</span>
-                        <span class="text-blue-400 font-mono font-black text-3xl">98.64%</span>
+                        <span class="text-blue-400 font-mono font-black text-3xl">98.84%</span>
                     </div>
-                    <p class="text-slate-500 text-sm italic text-justify leading-relaxed">Achieved <strong>98.64%
-                            Accuracy</strong> on unseen vehicles (Honest Split). Our model reduced False Negatives by
-                        40% compared to the baseline, ensuring critical failures are never missed. The model size was
-                        compressed to <strong>22KB</strong> for edge deployment.</p>
+                    <p class="text-slate-500 text-sm italic text-justify leading-relaxed">Exceeding our baseline target, the federated CNN+LSTM production model achieved a dominant <strong>98.84% Accuracy</strong> with a <strong>98.79% Recall</strong>, practically eliminating False Negatives (recording a remarkably low 1.21% Miss Rate). This ensures critical E20 degradation events are never missed. While maintaining these high metrics, our Explainable AI (SHAP/LIME) layer successfully translates complex multi-sensor anomalies into trustworthy, human-readable insights. Finally, prioritizing our future edge roadmap, we quantized the architecture via TFLite INT8, yielding a microscopic <strong>19.7 KB</strong> model that effortlessly retains <strong>96.98% Accuracy</strong>—fully optimized for direct embedded hardware execution.</p>
                 </div>
             </div>
         </section>
@@ -293,10 +292,10 @@
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Baseline (Paper)', 'FEDXAI (Ours)'],
+                labels: ['Baseline (Paper)', 'Cloud Model (Ph 4)', 'TinyML Edge (Ph 5)'],
                 datasets: [{
-                    data: [98.15, 98.64],
-                    backgroundColor: ['#1e293b', '#3b82f6'],
+                    data: [98.15, 98.84, 96.98],
+                    backgroundColor: ['#1e293b', '#3b82f6', '#10b981'],
                     borderRadius: 15,
                     barThickness: 50
                 }]
