@@ -52,7 +52,7 @@
 | Item | Detail |
 |------|--------|
 | **Benchmark** | 98.15% Accuracy (Paper Target) |
-| **Our Result** | 75.23% Global Accuracy (on 1000-vehicle sample, 5 rounds) |
+| **Our Result** | 75.23% Global Accuracy (on 1000-vehicle sample, 5 rounds) | 
 | **Gap Identified** | Model lacks E20-specific sensor context & real-world time-series dynamics |
 
 ---
@@ -174,63 +174,52 @@
 
 ---
 
-## Phase 4: Indian Solution — Productization & Edge Deployment
-> *Flowchart Reference: `PHASE 4: INDIAN SOLUTION`*
-> **Objective:** Compress the trained model, flash it to an OBD-II dongle, and deliver maintenance alerts via a web dashboard.
+## Phase 4: Software-in-the-Loop (SITL) Interface Integration
+> *Flowchart Reference: `PHASE 4: SITL INTEGRATION`*
+> **Objective:** Validate the predictive XAI model via a local Python backend streaming dynamic OBD-II telemetry to the interactive web dashboard, bypassing hardware requirements.
 
-### Step 4.1: TinyML Compression (Model Quantization)
+### Step 4.1: Python REST API Simulation Backend
 | Item | Detail |
 |------|--------|
-| **Input** | `fedxai_production_best.keras` (456 KB, CNN+LSTM, 98.84% acc) |
-| **Edge Model** | Compact 1D-CNN (Conv1D×3 + BatchNorm + GlobalAvgPool + Dense, 10,289 params) — TFLite Micro native |
-| **Keras Accuracy** | **98.64%** |
-| **TFLite Format** | Dynamic Range Quantization (INT8 weights, float32 activations) |
-| **TFLite Accuracy** | **98.64%** (0.20% degradation from cloud model) |
-| **TFLite Recall** | **98.99%** (only 21 failures missed out of 2,072) |
-| **TFLite Precision** | **98.37%** (34 false alarms out of 1,964 healthy) |
-| **Edge Model Size** | **22.6 KB** (target was <50 KB — exceeded by 2.2×) |
-| **ESP32 Flash Usage** | 0.14% of 16MB |
-| **Confusion Matrix** | `TN=1930  FP=34  /  FN=21  TP=2051` |
-| **C Header** | `phase4_edge/fedxai_model.h` — model bytes embedded for direct MCU inclusion |
-| **Scripts** | `phase4_realistic.py` |
-| **Artifacts** | `fedxai_edge_realistic.keras`, `phase4_edge/fedxai_realistic.tflite`, `phase4_edge/fedxai_model.h` |
+| **Architecture** | Flask Web Server (`backend_api.py`) with CORS |
+| **Data Engine** | State machine generating continuous rolling 30-step healthy baseline data |
+| **Fault Injection** | Interactive `POST /api/inject` endpoint allowing manual triggering of filter clogs or cooling failures |
+| **Model Serving** | Loads `fedxai_production_best.keras` and runs inference at 1Hz on the simulated window |
 | **Status** | ✅ COMPLETE |
 
-### Step 4.2: Hardware Integration (ESP32-S3 Firmware)
+### Step 4.2: Web Dashboard Interconnectivity (`web3.html`)
 | Item | Detail |
 |------|--------|
-| **Target MCU** | ESP32-S3-WROOM-1 (Dual Xtensa LX7 @ 240MHz, 512KB SRAM + 8MB PSRAM, WiFi + BLE 5.0) |
-| **Inference Engine** | TensorFlow Lite Micro (TFLM) with AllOpsResolver |
-| **OBD-II Interface** | ELM327 chipset → UART (38400 baud) → ESP32 GPIO16/17 |
-| **Firmware** | `phase4_edge/main.cpp` — Full C++ implementation with OBD-II polling, sliding window, TFLite inference, BLE, XAI alerts |
-| **Build System** | PlatformIO (`phase4_edge/platformio.ini`) |
-| **Memory Budget** | Model: 20KB + Interpreter: 32KB + BLE: 30KB + Buffers: 2KB = **~84KB / 512KB SRAM** |
-| **BOM Cost** | ₹1,385 (~$17 USD) per unit |
-| **Status** | ✅ FIRMWARE WRITTEN (needs hardware to flash) |
-
-### Step 4.3: Real-World System Architecture (OBD-II Smart Dongle)
-| Component | Role |
-|-----------|------|
-| **Physical Car** | Generates live OBD-II sensor data (PIDs: RPM, Fuel Pressure, Coolant Temp, etc.) |
-| **FedXAI Dongle** | Reads OBD-II data → runs TFLite inference → generates local XAI alert |
-| **Edge Inference** | Real-time prediction: "Healthy" or "Failure Imminent" |
-| **Local Fine-Tuning** | Periodically re-trains the last dense layers on local driving data (pFL on-device) |
-| **Local Alert Gen** | SHAP-based translation: sensor contributions → human-readable diagnosis |
-| **Mobile App** | Receives alerts  `"Check Fuel Filter"`, `"Coolant System Warning"` |
-
-### Step 4.4: Web Dashboard Interface (PWA)
-| Item | Detail |
-|------|--------|
-| **Type** | Progressive Web App (PWA) — Zero install, runs in Chrome/Edge |
-| **Tech Stack** | HTML5, TailwindCSS (CDN), Chart.js (CDN), Leaflet.js (Map), Web Bluetooth API |
-| **Features** | Real-time sensor gauges, Eco-Score Gamification, XAI Alert Overlay, OpenRouteService GPS Mechanic Routing, Historical Logbook |
-| **Communication** | Direct Bluetooth Low Energy (BLE) via Browser |
-| **Status** | ✅ COMPLETE (web3.html fully implemented) |
+| **Data Polling** | JavaScript `fetch()` interval retrieving data from `GET /api/telemetry` |
+| **Interactive UI** | Dashboard includes 'Inject Filter Clog' and 'Inject Overheat' manual fault-triggers |
+| **Heuristics Mapping** | Backend AI predictions are mapped to human-readable string explanations fed directly into the Critical Alert overlay |
+| **Status** | ✅ COMPLETE |
 
 ### Phase 4 Output
 | Item | Detail |
 |------|--------|
-| **Deliverable** | A plug-and-play OBD-II dongle that reads car data, predicts failures using a privacy-preserving AI model, and sends plain-language maintenance alerts to the driver's phone |
+| **Deliverable** | A fully-functional end-to-end software simulation demonstrating real-time model inference, XAI anomaly interpretation, and UI gamification without physical hardware dependency. |
+
+---
+
+## Phase 5: Future Roadmap — Hardware Edge Deployment 
+> *Flowchart Reference: `PHASE 5: FUTURE HARDWARE`*
+> **Objective:** Compress the trained model and flash it directly to an physical OBD-II dongle for edge execution.
+
+### Step 5.1: TinyML Compression (Model Quantization)
+| Item | Detail |
+|------|--------|
+| **Input** | `fedxai_production_best.keras` (456 KB, CNN+LSTM, 98.84% acc) |
+| **Edge Model** | Compact 1D-CNN (Conv1D×3 + BatchNorm + GlobalAvgPool + Dense, 10,289 params) — TFLite Micro native |
+| **Edge Model Size** | **22.6 KB** (target was <50 KB — exceeded by 2.2×) |
+| **Status** | ✅ COMPLETE (Prepared in advance) |
+
+### Step 5.2: Hardware Integration (ESP32-S3 Firmware)
+| Item | Detail |
+|------|--------|
+| **Target MCU** | ESP32-S3-WROOM-1 |
+| **Firmware** | C++ implementation with OBD-II polling, sliding window, TFLite inference, and BLE |
+| **Status** | 🟡 PENDING HARDWARE AVAILABILITY (Firmware drafted) |
 
 ---
 
@@ -257,13 +246,15 @@
 | `lime_explanation_failure.png` | 3 | LIME local explanation for failure case |
 | `lime_explanation_healthy.png` | 3 | LIME local explanation for healthy case |
 | `lime_feature_importance.png` | 3 | LIME aggregated feature importance bar chart |
-| `phase4_tinyml.py` | 4 | TinyML pipeline: CNN retrain + TFLite conversion + validation |
-| `validate_tflite.py` | 4 | TFLite model accuracy validation |
-| `fedxai_edge_cnn.keras` | 4 | Pure CNN edge model (97.32% accuracy) |
-| `phase4_edge/fedxai_dynamic.tflite` | 4 | **Edge TFLite model (19.7 KB, 96.98% acc)** |
-| `phase4_edge/fedxai_model.h` | 4 | C header with embedded model bytes for ESP32 |
-| `phase4_edge/main.cpp` | 4 | ESP32-S3 firmware (OBD-II + TFLite + BLE + XAI) |
-| `phase4_edge/platformio.ini` | 4 | PlatformIO build configuration |
+| `backend_api.py` | 4 | SITL Python backend serving Keras model |
+| `phase4_web/web3.html` | 4 | Real-time dashboard with OpenRouteService & SITL injection |
+| `phase4_tinyml.py` | 5 | TinyML pipeline: CNN retrain + TFLite conversion + validation |
+| `validate_tflite.py` | 5 | TFLite model accuracy validation |
+| `fedxai_edge_cnn.keras` | 5 | Pure CNN edge model (97.32% accuracy) |
+| `phase4_edge/fedxai_dynamic.tflite` | 5 | **Edge TFLite model (19.7 KB, 96.98% acc)** |
+| `phase4_edge/fedxai_model.h` | 5 | C header with embedded model bytes for ESP32 |
+| `phase4_edge/main.cpp` | 5 | ESP32-S3 firmware (OBD-II + TFLite + BLE + XAI) |
+| `phase4_edge/platformio.ini` | 5 | PlatformIO build configuration |
 | `FEDXAI_Architecture_Blueprint.md` | — | Mermaid flowchart of full architecture |
 | `PHASES_XAI_IMPLEMENTATION_PLAN.md` | — | This file: Full project implementation plan |
 
@@ -276,7 +267,8 @@
 | **Phase 1** | Foundation & Baseline Validation | ✅ COMPLETE |
 | **Phase 2** | Digital Twin & Data Factory | ✅ COMPLETE |
 | **Phase 3** | Advanced FedXAI Framework | ✅ COMPLETE |
-| **Phase 4** | Indian Solution (Edge Deployment) | 🟡 IN PROGRESS (4.1 ✅, 4.2 ✅, 4.3 🔲, 4.4 ✅) |
+| **Phase 4** | Software-in-the-Loop Simulation & Web | ✅ COMPLETE |
+| **Phase 5** | Future Roadmap (Hardware Edge Deployment) | 🟡 PENDING HARDWARE |
 
 ---
 

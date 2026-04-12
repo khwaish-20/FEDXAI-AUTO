@@ -514,9 +514,24 @@
                 <p class="text-gray-400 font-rajdhani text-lg">Interactive vehicle health monitoring system</p>
             </div>
 
-            <!-- Car Blueprint Container -->
-            <div class="relative flex justify-center items-center mb-12">
-                <div class="relative" style="width: 400px; height: 700px;">
+            <!-- Interactive Car Diagram with Controls -->
+            <div class="flex flex-col lg:flex-row justify-center items-center gap-4 lg:gap-12 mb-4 relative">
+                
+                <!-- Left Control Buttons -->
+                <div class="flex flex-col gap-8 items-end z-10 hidden lg:flex" style="margin-top: -100px;">
+                    <button class="demo-btn w-48 flex items-center justify-start" onclick="injectFault('filter_clog', this)" style="padding: 14px 20px; font-size: 13px;">
+                        <i class="fas fa-filter mr-3 w-5 text-center"></i> FILTER CLOG
+                    </button>
+                    <button class="demo-btn w-48 flex items-center justify-start" onclick="injectFault('cooling_failure', this)" style="padding: 14px 20px; font-size: 13px;">
+                        <i class="fas fa-temperature-high mr-3 w-5 text-center"></i> OVERHEAT
+                    </button>
+                    <button class="demo-btn w-48 flex items-center justify-start" onclick="injectFault('alternator_failure', this)" style="padding: 14px 20px; font-size: 13px;">
+                        <i class="fas fa-bolt mr-3 w-5 text-center"></i> ALTERNATOR
+                    </button>
+                </div>
+
+                <!-- Car Blueprint Container -->
+                <div class="relative shrink-0" style="width: 400px; height: 700px;">
                     <!-- SVG Car Blueprint -->
                     <svg class="car-blueprint absolute inset-0 w-full h-full" viewBox="0 0 400 700"
                         preserveAspectRatio="xMidYMid meet">
@@ -673,14 +688,49 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Right Control Buttons -->
+                <div class="flex flex-col gap-8 items-start z-10 hidden lg:flex" style="margin-top: -100px;">
+                    <button class="demo-btn w-48 flex items-center justify-start" onclick="injectFault('oil_leak', this)" style="padding: 14px 20px; font-size: 13px;">
+                        <i class="fas fa-oil-can mr-3 w-5 text-center"></i> OIL LEAK
+                    </button>
+                    <button class="demo-btn w-48 flex items-center justify-start" onclick="injectFault('catalyst_degradation', this)" style="padding: 14px 20px; font-size: 13px;">
+                        <i class="fas fa-wind mr-3 w-5 text-center"></i> CATALYST
+                    </button>
+                    <button class="demo-btn w-48 flex items-center justify-start" onclick="injectFault('brake_wear_fr', this)" style="padding: 14px 20px; font-size: 13px;">
+                        <i class="fas fa-circle-notch mr-3 w-5 text-center"></i> BRAKE (FR)
+                    </button>
+                </div>
             </div>
 
-            <!-- Demo Button -->
-            <div class="text-center">
-                <button id="demoBtn" class="demo-btn" onclick="runDemo()">
-                    <i class="fas fa-play mr-2"></i> RUN DIAGNOSTIC DEMO
+            <!-- Mobile Fallback Controls -->
+            <div class="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto mb-6 lg:hidden">
+                <button class="demo-btn" onclick="injectFault('filter_clog', this)" style="padding: 10px 16px; font-size: 13px;">
+                    <i class="fas fa-filter mr-2"></i> FILTER CLOG
                 </button>
-                <p class="text-gray-500 text-sm mt-4 font-rajdhani">Simulates E20 Fuel Pump degradation scenario</p>
+                <button class="demo-btn" onclick="injectFault('cooling_failure', this)" style="padding: 10px 16px; font-size: 13px;">
+                    <i class="fas fa-temperature-high mr-2"></i> OVERHEAT
+                </button>
+                <button class="demo-btn" onclick="injectFault('alternator_failure', this)" style="padding: 10px 16px; font-size: 13px;">
+                    <i class="fas fa-bolt mr-2"></i> ALTERNATOR
+                </button>
+                <button class="demo-btn" onclick="injectFault('oil_leak', this)" style="padding: 10px 16px; font-size: 13px;">
+                    <i class="fas fa-oil-can mr-2"></i> OIL LEAK
+                </button>
+                <button class="demo-btn" onclick="injectFault('catalyst_degradation', this)" style="padding: 10px 16px; font-size: 13px;">
+                    <i class="fas fa-wind mr-2"></i> CATALYST
+                </button>
+                <button class="demo-btn" onclick="injectFault('brake_wear_fr', this)" style="padding: 10px 16px; font-size: 13px;">
+                    <i class="fas fa-circle-notch mr-2"></i> BRAKE (FR)
+                </button>
+            </div>
+
+            <!-- Reset Button Below Blueprint -->
+             <div class="text-center mb-8">
+                <button class="ble-btn mx-auto transition-all" onclick="injectFault('none', this)" style="border-color: #00ff88; color: #00ff88; padding: 12px 48px; border-width: 2px;">
+                    <i class="fas fa-undo mr-2"></i> RESET SYSTEM
+                </button>
+                <p class="text-gray-500 text-sm font-rajdhani mt-4">Interact with the Python backend to simulate failure conditions</p>
             </div>
 
             <!-- Component Legend -->
@@ -711,29 +761,7 @@
                 <p class="text-gray-400 font-rajdhani text-lg">Real-time OBD-II data stream visualization</p>
             </div>
 
-            <!-- Top Bar: Bluetooth Connection -->
-            <div class="glass-panel rounded-xl p-6 mb-8">
-                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div class="flex items-center gap-4">
-                        <i class="fab fa-bluetooth-b text-3xl text-neon-blue"></i>
-                        <div>
-                            <h3 class="font-orbitron text-xl font-bold text-white">OBD-II Connection</h3>
-                            <p class="text-gray-400 text-sm font-rajdhani">Web Bluetooth API Ready</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <div id="connectionStatus" class="connection-status disconnected">
-                            <div class="status-dot"></div>
-                            <span id="statusText">DISCONNECTED</span>
-                        </div>
-                        <button class="ble-btn" onclick="connectBluetooth()">
-                            <i class="fas fa-link"></i>
-                            <span>Connect Device</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <!-- Top Bar Removed per user request -->
 
             <!-- Digital Gauges Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -899,22 +927,21 @@
                 <p class="text-gray-400 font-rajdhani text-lg">Predictive Scheduling & Maintenance Logs</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Predictive Scheduling -->
-                <div class="glass-panel p-6 rounded-xl col-span-1">
+                <div class="glass-panel p-6 rounded-xl col-span-1 flex flex-col">
                     <h3 class="font-orbitron text-lg font-bold text-white mb-6">
                         <i class="fas fa-calendar-check text-neon-blue mr-2"></i>PREDICTIVE WEAR
                     </h3>
 
-                    <div class="space-y-6">
+                    <div class="space-y-4 flex-1">
                         <div>
                             <div class="flex justify-between text-sm font-rajdhani mb-2">
                                 <span class="text-gray-300">Brake Pads</span>
                                 <span class="text-yellow-400">450 km left</span>
                             </div>
                             <div class="w-full h-1.5 bg-gray-800 rounded-full">
-                                <div class="h-full bg-yellow-400 rounded-full shadow-[0_0_10px_#facc15]"
-                                    style="width: 15%"></div>
+                                <div class="h-full bg-yellow-400 rounded-full shadow-[0_0_10px_#facc15]" style="width: 15%"></div>
                             </div>
                         </div>
                         <div>
@@ -923,31 +950,55 @@
                                 <span class="text-neon-green">22% life</span>
                             </div>
                             <div class="w-full h-1.5 bg-gray-800 rounded-full">
-                                <div class="h-full bg-neon-green rounded-full shadow-[0_0_10px_#00ff88]"
-                                    style="width: 22%"></div>
+                                <div class="h-full bg-neon-green rounded-full shadow-[0_0_10px_#00ff88]" style="width: 22%"></div>
                             </div>
                         </div>
                         <div>
                             <div class="flex justify-between text-sm font-rajdhani mb-2">
-                                <span class="text-gray-300">Fuel Filter </span>
+                                <span class="text-gray-300">Fuel Filter</span>
                                 <span id="fw-label" class="text-neon-blue font-bold">1200 km left</span>
                             </div>
                             <div class="w-full h-1.5 bg-gray-800 rounded-full">
-                                <div id="fw-bar"
-                                    class="h-full bg-neon-blue rounded-full shadow-[0_0_10px_#00f0ff] transition-all duration-1000"
-                                    style="width: 85%"></div>
+                                <div id="fw-bar" class="h-full bg-neon-blue rounded-full shadow-[0_0_10px_#00f0ff] transition-all duration-1000" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-rajdhani mb-2">
+                                <span class="text-gray-300">Engine Coolant</span>
+                                <span class="text-neon-green">Healthy</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-800 rounded-full">
+                                <div class="h-full bg-neon-green rounded-full shadow-[0_0_10px_#00ff88]" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-rajdhani mb-2">
+                                <span class="text-gray-300">Alternator Belt</span>
+                                <span class="text-neon-green">Good Tension</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-800 rounded-full">
+                                <div class="h-full bg-neon-green rounded-full shadow-[0_0_10px_#00ff88]" style="width: 78%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-rajdhani mb-2">
+                                <span class="text-gray-300">Catalytic Substrate</span>
+                                <span class="text-neon-blue">Optimal</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-800 rounded-full">
+                                <div class="h-full bg-neon-blue rounded-full shadow-[0_0_10px_#00f0ff]" style="width: 95%"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Maintenance History Table -->
-                <div class="glass-panel p-6 rounded-xl col-span-1 lg:col-span-2">
+                <div class="glass-panel p-6 rounded-xl col-span-1 flex flex-col">
                     <h3 class="font-orbitron text-lg font-bold text-white mb-4">
-                        <i class="fas fa-history text-neon-blue mr-2"></i>AI EVENT LOGBOOK
+                        <i class="fas fa-history text-neon-blue mr-2"></i>EVENT LOGBOOK
                     </h3>
 
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto flex-1">
                         <table class="w-full text-left font-rajdhani">
                             <thead>
                                 <tr class="border-b border-gray-800 text-gray-500 text-xs tracking-widest uppercase">
@@ -1007,13 +1058,13 @@
         // ============================================
         // GLOBAL VARIABLES
         // ============================================
-        let isDemoRunning = false;
-        let demoInterval = null;
         let rpmChart, fuelChart;
-        let isBluetoothConnected = false;
+        let isBackendConnected = false;
+        let telemetryInterval = null;
 
         // Advanced Features State
         let mapInitialized = false;
+        let acknowledgedFaultState = null;
         let map;
         let carMarker;
         let routingLine;
@@ -1297,127 +1348,134 @@
         }
 
         // ============================================
-        // DEMO SIMULATION
+        // SITL SIMULATION API
         // ============================================
-        function runDemo() {
-            if (isDemoRunning) return;
-
-            isDemoRunning = true;
-            const btn = document.getElementById('demoBtn');
-            btn.classList.add('running');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> RUNNING DIAGNOSTIC...';
-
-            addLogEntry('[DEMO] Starting diagnostic simulation...', 'info');
-            addLogEntry('[DEMO] All systems nominal', 'success');
-
-            // Reset all nodes to healthy
-            resetAllNodes();
-
-            // Simulate normal operation for 3 seconds
-            let elapsedTime = 0;
-            demoInterval = setInterval(() => {
-                elapsedTime += 250;
-
-                // Normal fluctuation
-                const rpm = 700 + Math.random() * 100;
-                const fuelPressure = 340 + Math.random() * 20;
-                const fuelTrim = 2 + Math.random() * 1;
-
-                // Eco Score Logic (Normal Cruising = slowly recover)
-                if (ecoScore < 100) ecoScore += 0.5;
-                if (ecoScore > 100) ecoScore = 100;
-
-                updateGauges(rpm, fuelPressure, fuelTrim);
-                updateCharts(rpm, fuelPressure, fuelTrim);
-                updateEcoScore();
-
-                // Trigger failure at 3 seconds (once)
-                if (elapsedTime === 3000) {
-                    triggerFuelPumpFailure();
+        
+        async function injectFault(type, btnElement) {
+            try {
+                // Reset all button styles just visual feedback
+                document.querySelectorAll('.demo-btn, .ble-btn').forEach(b => b.classList.remove('running'));
+                
+                const response = await fetch('http://localhost:5000/api/inject', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fault: type })
+                });
+                
+                if (response.ok) {
+                    if (type === 'none') {
+                        addLogEntry('[API] Simulation reset to healthy state', 'info');
+                        acknowledgedFaultState = null;
+                        resetAllNodes();
+                    } else {
+                        btnElement.classList.add('running');
+                        addLogEntry(`[API] Fault Injection Commanded: ${type}`, 'warning');
+                    }
                 }
-
-                // Stop after 10 seconds
-                if (elapsedTime >= 10000) {
-                    stopDemo();
-                }
-            }, 250);
+            } catch (error) {
+                addLogEntry(`[API] Error injecting fault: ${error.message}`, 'error');
+            }
         }
 
-        function triggerFuelPumpFailure() {
-            // Change fuel pump node to critical
-            const fuelPumpNode = document.getElementById('node-fuelpump');
-            fuelPumpNode.classList.remove('healthy');
-            fuelPumpNode.classList.add('critical');
+        function triggerFaultUI(alertMsg, faultType) {
+            // Visualize fault on blueprint
+            resetAllNodes();
+            let diagnosisDesc = alertMsg;
+            let component = "Unknown Component";
+            let alertTitleStr = "ANOMALY DETECTED";
+            let specificDetailsHtml = "";
+            let explanationText = "";
+            
+            if (faultType === 'filter_clog') {
+                const fuelPumpNode = document.getElementById('node-fuelpump');
+                fuelPumpNode.classList.remove('healthy');
+                fuelPumpNode.classList.add('critical');
+                fuelPumpNode.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-red">FUEL SYSTEM - CRITICAL</div><div class="text-gray-300">Status: CLOGGED/DEGRADED</div>`;
+                
+                document.getElementById('fuelPressureValue').classList.add('critical');
+                document.getElementById('fuelTrimValue').classList.add('critical');
+                component = "Fuel Filter / Pump";
+                alertTitleStr = "E20 Fuel Pump Degradation Detected";
+                specificDetailsHtml = `<div class="mb-2"><span class="text-neon-red">●</span> Pressure drop: 350 kPa → 180 kPa</div><div><span class="text-neon-red">●</span> Trim increase: +2.5% → +18.7%</div>`;
+                explanationText = "The fuel pump is experiencing mechanical wear, causing insufficient fuel delivery. The ECU is compensating by increasing fuel trim beyond normal parameters.";
+                
+                // Update Predictive bar visual 
+                document.getElementById('fw-label').innerHTML = '<span class="text-neon-red">IMMEDIATE REPLACEMENT</span>';
+                document.getElementById('fw-bar').style.width = '0%';
+                document.getElementById('fw-bar').className = 'h-full bg-neon-red rounded-full shadow-[0_0_10px_#ff0040] transition-all duration-1000';
+            } else if (faultType === 'cooling_failure') {
+                const radiatorNode = document.getElementById('node-radiator');
+                radiatorNode.classList.remove('healthy');
+                radiatorNode.classList.add('critical');
+                radiatorNode.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-red">RADIATOR - CRITICAL</div><div class="text-gray-300">Status: OVERHEATING</div>`;
+                component = "Cooling System";
+                alertTitleStr = "Engine Coolant Thermal Runaway";
+                specificDetailsHtml = `<div class="mb-2"><span class="text-neon-red">●</span> Radiator Temp: Spiking above 120°C</div><div><span class="text-neon-red">●</span> RPM: Unstable idle detected</div>`;
+                explanationText = "Coolant circulation failure detected. The system predicts immediate overheating and potential thermal warping of the engine block.";
+            } else if (faultType === 'alternator_failure') {
+                const altNode = document.getElementById('node-alternator');
+                altNode.classList.remove('healthy');
+                altNode.classList.add('critical');
+                altNode.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-red">ALTERNATOR - CRITICAL</div><div class="text-gray-300">Status: VOLTAGE DROP</div>`;
+                component = "Charging System";
+                alertTitleStr = "Alternator Voltage Output Failure";
+                specificDetailsHtml = `<div class="mb-2"><span class="text-neon-red">●</span> O2 Sensor: Voltage erratic or dropping</div><div><span class="text-neon-red">●</span> Electrical Load: Compensation failed</div>`;
+                explanationText = "The alternator's diode pack or regulator has degraded, meaning the vehicle's battery is bearing the entire electrical load. The engine ECU is struggling to calculate proper injector pulse widths without sufficient voltage.";
+            } else if (faultType === 'oil_leak') {
+                const oilNode = document.getElementById('node-oilpan');
+                oilNode.classList.remove('healthy');
+                oilNode.classList.add('critical');
+                oilNode.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-red">OIL PAN - CRITICAL</div><div class="text-gray-300">Status: PRESSURE LOSS</div>`;
+                component = "Lubrication System";
+                alertTitleStr = "Catastrophic Oil Pressure Loss";
+                specificDetailsHtml = `<div class="mb-2"><span class="text-neon-red">●</span> Engine RPM: Dropping anomalously</div><div><span class="text-neon-red">●</span> Coolant Temp: Rising smoothly</div>`;
+                explanationText = "A severe leak in the oil pan or a pump pressure failure has caused a critical reduction in lubrication. The engine is experiencing excessive internal friction, threatening imminent piston ring seizure.";
+            } else if (faultType === 'catalyst_degradation') {
+                const catNode = document.getElementById('node-catalyst');
+                catNode.classList.remove('healthy');
+                catNode.classList.add('critical');
+                catNode.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-red">CATALYST - CRITICAL</div><div class="text-gray-300">Status: EFFICIENCY DROP</div>`;
+                component = "Exhaust System";
+                alertTitleStr = "Catalytic Converter Failure";
+                specificDetailsHtml = `<div class="mb-2"><span class="text-neon-red">●</span> Cat Temp: Exceeding 850°C quickly</div><div><span class="text-neon-red">●</span> Downstream O2: Pegged high consistently</div>`;
+                explanationText = "The catalytic converter substrate has deteriorated, melted, or fouled. The downstream O2 sensor confirms that exhaust gases are no longer being scrubbed of emissions effectively, and back-pressure is mounting.";
+            } else if (faultType === 'brake_wear_fr') {
+                const brakeNode = document.getElementById('node-brake-fr');
+                brakeNode.classList.remove('healthy');
+                brakeNode.classList.add('critical');
+                brakeNode.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-red">BRAKE FR - CRITICAL</div><div class="text-gray-300">Status: CALIPER SEIZED</div>`;
+                component = "Braking System (FR)";
+                alertTitleStr = "Front-Right Caliper Drag Detected";
+                specificDetailsHtml = `<div class="mb-2"><span class="text-neon-red">●</span> Drivetrain Drag: Undue RPM resistance</div><div><span class="text-neon-red">●</span> Wheel Speed: Variance inferred as abnormal</div>`;
+                explanationText = "The Front-Right brake caliper piston has seized slightly and is continuously applying active friction to the rotor while driving. If disregarded, the rotor will warp and the boiling brake fluid could cause total brake failure.";
+            }
+            
+            // Show alert overlay
+            const alertTitle = document.querySelector('#alertOverlay .font-semibold');
+            if(alertTitle) alertTitle.textContent = "AI PREDICTIVE FAILURE DETECTED";
+            
+            const specificTitle = document.querySelector('#alertOverlay .text-white.text-lg.mb-2.font-rajdhani.font-semibold');
+            if(specificTitle) specificTitle.textContent = alertTitleStr;
+            
+            const explanation = document.querySelector('#alertOverlay .glass-panel .text-gray-400.text-sm.font-rajdhani');
+            if(explanation) explanation.textContent = explanationText;
+            
+            // Re-map the hard-coded HTML to be dynamic
+            const dynamicDetails = document.querySelector('#alertOverlay .text-gray-400.text-sm.mb-6.font-rajdhani');
+            if(dynamicDetails) dynamicDetails.innerHTML = specificDetailsHtml;
 
-            // Update tooltip
-            const tooltip = fuelPumpNode.querySelector('.node-tooltip');
-            tooltip.innerHTML = `
-                <div class="font-bold text-neon-red">FUEL PUMP - CRITICAL</div>
-                <div class="text-gray-300">Pressure: 180 kPa | Status: DEGRADED</div>
-            `;
-
-            // Update gauge styling
-            document.getElementById('fuelPressureValue').classList.add('critical');
-            document.getElementById('fuelTrimValue').classList.add('critical');
-
-            // Show alert
-            setTimeout(() => {
-                document.getElementById('alertOverlay').classList.add('active');
-            }, 500);
-
-            addLogEntry('[ALERT] Fuel pump degradation detected!', 'error');
-            addLogEntry('[XAI] Pressure drop + Trim increase pattern identified', 'warning');
-
-            // Route Map to mechanic
-            triggerMechanicRouting();
-
+            document.getElementById('alertOverlay').classList.add('active');
+            addLogEntry(`[ALERT] ${alertMsg}`, 'error');
+            
             // Store active alert data for the logbook
             activeAlertData = {
-                component: 'Fuel Pump system',
-                diagnosis: 'Mechanical degradation detected via Fuel Trim compensation (98% confidence)'
+                component: component,
+                diagnosis: alertMsg,
+                faultType: faultType
             };
-
-            // Update Predictive Scheduling bar visual 
-            document.getElementById('fw-label').innerHTML = '<span class="text-neon-red">IMMEDIATE REPLACEMENT REQUIRED</span>';
-            document.getElementById('fw-bar').style.width = '0%';
-            document.getElementById('fw-bar').className = 'h-full bg-neon-red rounded-full shadow-[0_0_10px_#ff0040] transition-all duration-1000';
-
-            // Simulate failure data
-            let failureTime = 0;
-            const failureInterval = setInterval(() => {
-                failureTime += 250;
-
-                // Rapid pressure drop and trim spike
-                const currentPressure = 350 - (failureTime / 50);
-                const currentTrim = 2.5 + (failureTime / 150);
-
-                const rpm = 750 + Math.random() * 50;
-                const fuelPressure = Math.max(180, currentPressure);
-                const fuelTrim = Math.min(25, currentTrim);
-
-                // Fuel Delivery Failure directly drains Eco Score due to rich/lean imbalance
-                ecoScore -= 2.5;
-                if (ecoScore < 35) ecoScore = 35; // Bottom out at 35 during this demo
-
-                updateGauges(rpm, fuelPressure, fuelTrim);
-                updateCharts(rpm, fuelPressure, fuelTrim);
-                updateEcoScore();
-
-                if (failureTime >= 3000) {
-                    clearInterval(failureInterval);
-                }
-            }, 250);
-        }
-
-        function stopDemo() {
-            clearInterval(demoInterval);
-            isDemoRunning = false;
-
-            const btn = document.getElementById('demoBtn');
-            btn.classList.remove('running');
-            btn.innerHTML = '<i class="fas fa-play mr-2"></i> RUN DIAGNOSTIC DEMO';
-
-            addLogEntry('[DEMO] Diagnostic simulation complete', 'info');
+            
+            // Route Map to mechanic
+            triggerMechanicRouting();
         }
 
         function resetAllNodes() {
@@ -1425,10 +1483,35 @@
             nodes.forEach(node => {
                 node.classList.remove('critical', 'warning');
                 node.classList.add('healthy');
+                
+                // Reset tooltips loosely
+                if(node.id === 'node-fuelpump') {
+                    node.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-blue">FUEL PUMP</div><div class="text-gray-300">Pressure: ~350 kPa | Status: NORMAL</div>`;
+                }
+                if(node.id === 'node-radiator') {
+                    node.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-blue">RADIATOR</div><div class="text-gray-300">Temp: ~90°C | Status: NORMAL</div>`;
+                }
+                if(node.id === 'node-alternator') {
+                    node.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-blue">ALTERNATOR</div><div class="text-gray-300">Output: 14.2V | Status: NORMAL</div>`;
+                }
+                if(node.id === 'node-oilpan') {
+                    node.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-blue">OIL PAN</div><div class="text-gray-300">Pressure: ~45 psi | Status: NORMAL</div>`;
+                }
+                if(node.id === 'node-catalyst') {
+                    node.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-blue">CATALYTIC CONVERTER</div><div class="text-gray-300">Efficiency: ~95% | Status: NORMAL</div>`;
+                }
+                if(node.id === 'node-brake-fr') {
+                    node.querySelector('.node-tooltip').innerHTML = `<div class="font-bold text-neon-blue">BRAKE FR</div><div class="text-gray-300">Pad: ~82% | Status: NORMAL</div>`;
+                }
             });
 
             document.getElementById('fuelPressureValue').classList.remove('critical');
             document.getElementById('fuelTrimValue').classList.remove('critical');
+            
+            // Reset predictive bar
+            document.getElementById('fw-label').innerHTML = '1200 km left';
+            document.getElementById('fw-bar').style.width = '85%';
+            document.getElementById('fw-bar').className = 'h-full bg-neon-blue rounded-full shadow-[0_0_10px_#00f0ff] transition-all duration-1000';
         }
 
         function closeAlert() {
@@ -1437,6 +1520,8 @@
             // Log the acknowledged alert to the Historical Logbook
             if (activeAlertData) {
                 logMaintenanceEvent(activeAlertData.component, activeAlertData.diagnosis);
+                // Mark this specific fault as acknowledged so it doesn't loop
+                acknowledgedFaultState = activeAlertData.faultType;
                 activeAlertData = null; // Clear it out pending next alert
             }
         }
@@ -1522,43 +1607,66 @@
         }
 
         // ============================================
-        // BLUETOOTH CONNECTION
+        // BACKEND CONNECTION
         // ============================================
-        async function connectBluetooth() {
-            addLogEntry('[BLE] Initiating Web Bluetooth connection...', 'info');
-
+        async function connectBackend() {
+            addLogEntry('[API] Connecting to SITL backend...', 'info');
             try {
-                const device = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: ['device_information']
-                });
-
-                addLogEntry(`[BLE] Device selected: ${device.name || 'Unknown'}`, 'success');
-
-                const server = await device.gatt.connect();
-                addLogEntry('[BLE] GATT server connected', 'success');
-
-                isBluetoothConnected = true;
-                updateConnectionStatus(true);
-
-                // Listen for disconnection
-                device.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
-
+                const response = await fetch('http://localhost:5000/api/telemetry');
+                if (response.ok) {
+                    addLogEntry('[API] Connection established', 'success');
+                    isBackendConnected = true;
+                    updateConnectionStatus(true);
+                    
+                    // Start polling
+                    if(telemetryInterval) clearInterval(telemetryInterval);
+                    telemetryInterval = setInterval(fetchTelemetry, 1000);
+                } else {
+                    throw new Error("Server responded with error");
+                }
             } catch (error) {
-                addLogEntry(`[BLE] Error: ${error.message}`, 'error');
-                console.error('Bluetooth error:', error);
+                addLogEntry(`[API] Connection failed: ${error.message}`, 'error');
+                updateConnectionStatus(false);
             }
         }
-
-        function onBluetoothDisconnected(event) {
-            isBluetoothConnected = false;
-            updateConnectionStatus(false);
-            addLogEntry('[BLE] Device disconnected', 'warning');
+        
+        async function fetchTelemetry() {
+            if (!isBackendConnected) return;
+            try {
+                const response = await fetch('http://localhost:5000/api/telemetry');
+                if (!response.ok) throw new Error("Connection lost");
+                
+                const data = await response.json();
+                
+                // Update UI based on data
+                updateGauges(data.rpm, data.fuelPressureKpa, data.fuelTrimLT);
+                updateCharts(data.rpm, data.fuelPressureKpa, data.fuelTrimLT);
+                
+                ecoScore = data.ecoScore;
+                updateEcoScore();
+                
+                // Handle Faults
+                if (data.systemStatus === 'critical' && 
+                    !document.getElementById('alertOverlay').classList.contains('active') &&
+                    data.activeFault !== 'none' &&
+                    data.activeFault !== acknowledgedFaultState) {
+                    triggerFaultUI(data.alertMessage, data.activeFault);
+                }
+                
+            } catch (error) {
+                console.error(error);
+                isBackendConnected = false;
+                updateConnectionStatus(false);
+                addLogEntry('[API] Connection to backend lost', 'error');
+                if(telemetryInterval) clearInterval(telemetryInterval);
+            }
         }
 
         function updateConnectionStatus(connected) {
             const statusEl = document.getElementById('connectionStatus');
             const statusText = document.getElementById('statusText');
+
+            if (!statusEl || !statusText) return;
 
             if (connected) {
                 statusEl.classList.remove('disconnected');
@@ -1606,27 +1714,12 @@
             initMap();
             updateEcoScore();
 
-            // Check Bluetooth API availability
-            if (!navigator.bluetooth) {
-                addLogEntry('[WARN] Web Bluetooth API not available in this browser', 'warning');
-            } else {
-                addLogEntry('[INFO] Web Bluetooth API available', 'success');
-            }
-
-            // Start live data simulation (idle mode)
-            setInterval(() => {
-                if (!isDemoRunning) {
-                    const rpm = 700 + Math.random() * 100;
-                    const fuelPressure = 340 + Math.random() * 20;
-                    const fuelTrim = 2 + Math.random() * 1;
-
-                    if (ecoScore < 100) ecoScore += 0.2;
-                    if (ecoScore > 100) ecoScore = 100;
-
-                    updateGauges(rpm, fuelPressure, fuelTrim);
-                    updateCharts(rpm, fuelPressure, fuelTrim);
-                    updateEcoScore();
-                }
+            addLogEntry('[INFO] SITL architecture initialized', 'info');
+            addLogEntry('[INFO] Pending backend connection', 'warning');
+            
+            // Auto connect to backend on load
+            setTimeout(() => {
+                connectBackend();
             }, 1000);
         });
 
