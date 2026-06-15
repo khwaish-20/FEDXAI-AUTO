@@ -35,16 +35,6 @@ FEDXAI-AUTO addresses the challenge of building accurate predictive maintenance 
 
 ## 🏗️ Architecture
 
-```
-┌─────────────┐    ┌──────────────┐    ┌─────────────────┐    ┌────────────┐
-│  Vehicle ECU │───▶│  ELM327 OBD  │───▶│  ESP32-S3 MCU   │───▶│ Mobile App │
-│  (8 sensors) │    │  (UART/BLE)  │    │  TFLite Micro   │    │ (Web/Chrome)│
-│              │    │              │    │  22.6KB model    │    │ Dashboard  │
-│  RPM, Temp,  │    │  PID Reader  │    │  98.64% Acc     │    │ XAI Alerts │
-│  Load, etc.  │    │              │    │  <100ms infer    │    │            │
-└─────────────┘    └──────────────┘    └─────────────────┘    └────────────┘
-```
-
 > See [`FEDXAI_Architecture_Blueprint.md`](FEDXAI_Architecture_Blueprint.md) for the full Mermaid diagram.
 
 ---
