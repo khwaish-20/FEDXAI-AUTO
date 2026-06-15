@@ -78,11 +78,11 @@ graph TD
         P4_Int --> Backend_HW
     end
 
-    %% --- PHASE 5: FUTURE HARDWARE EDGE DEPLOYMENT ---
-    subgraph Phase5 [PHASE 5: HARDWARE EDGE DEPLOYMENT]
+    %% --- PHASE 5: TINYML & HARDWARE INTEGRATION ---
+    subgraph Phase5 [PHASE 5: TINYML & HARDWARE INTEGRATION]
         direction TB
-        P3_Out -.-> P5_TinyML["Step 5.1: TinyML Compression<br/>TFLite INT8 Quantization"]:::process
-        P5_TinyML --> P5_FW["Step 5.2: Firmware Integration<br/>ESP32-S3 C++ Implementation"]:::process
+        P3_Out --> P5_TinyML["Step 5.1: TinyML Compression<br/>QAT Full INT8 Quantization"]:::process
+        P5_TinyML --> P5_FW["Step 5.2: Firmware Integration<br/>ESP32-S3 QAT INT8 Model Update"]:::process
         
         subgraph Edge_HW [Edge Hardware Execution]
             direction LR
