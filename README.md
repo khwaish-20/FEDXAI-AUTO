@@ -23,13 +23,13 @@ FEDXAI-AUTO addresses the challenge of building accurate predictive maintenance 
 
 ### Key Results
 
-| Metric | Cloud Model (Phase 3) | Edge Model (Phase 4) |
-|--------|:---:|:---:|
-| **Accuracy** | 98.84% | 98.64% |
-| **Recall** | 98.79% | 98.99% |
-| **Precision** | 98.94% | 98.37% |
-| **Model Size** | 456 KB | **22.6 KB** |
-| **Target Device** | Server/Cloud | ESP32-S3 MCU |
+| Metric | Cloud Model (Phase 3) | Edge Model (Phase 4 Float32) | Edge Model (Phase 5 QAT INT8) |
+|--------|:---:|:---:|:---:|
+| **Accuracy** | 98.84% | 98.64% | **98.84%** (0% drop) |
+| **Recall** | 98.79% | 98.99% | **99.42%** |
+| **Precision** | 98.94% | 98.37% | **98.33%** |
+| **Model Size** | 456 KB | 22.6 KB | **16.72 KB** (26% smaller) |
+| **Target Device** | Server/Cloud | ESP32-S3 MCU | ESP32-S3 (INT8 math) |
 
 ---
 
@@ -73,14 +73,16 @@ FEDXAI-AUTO/
 │   ├── lime_explanation_healthy.png        # LIME local explanation (healthy)
 │   └── lime_feature_importance.png         # LIME aggregated feature importance
 │
-├── 🔧 Phase 4 — Edge Deployment
+├── 🔧 Phase 4 & 5 — Edge Deployment & Quantization
 │   ├── phase4_realistic.py                 # TinyML pipeline (train + convert)
+│   ├── phase5_qat_int8.py                  # QAT training & full INT8 conversion
 │   ├── fedxai_edge_realistic.keras         # Edge Keras model (98.64%)
 │   └── phase4_edge/
 │       ├── main.cpp                        # ESP32-S3 firmware (C++)
 │       ├── platformio.ini                  # PlatformIO build config
-│       ├── fedxai_model.h                  # Embedded model C header
-│       └── fedxai_realistic.tflite         # TFLite model (22.6 KB)
+│       ├── fedxai_model.h                  # Embedded QAT INT8 model C header
+│       ├── fedxai_realistic.tflite         # Float32 TFLite model (22.6 KB)
+│       └── fedxai_qat_int8.tflite          # QAT INT8 TFLite model (16.7 KB)
 │
 └── .gitignore
 ```
@@ -106,11 +108,17 @@ FEDXAI-AUTO/
 - **Result:** **98.84% accuracy**, 98.79% recall, 1.21% miss rate
 
 ### Phase 4: Edge Deployment (Indian Solution)
-- **Model Compression:** CNN+LSTM → Pure CNN + Dynamic Quantization
-- **Edge Model:** 10,289 params, 22.6 KB TFLite, **98.64% accuracy**
+- **Model Compression:** CNN+LSTM → Pure CNN (22.6 KB float32, 98.64% accuracy)
 - **Hardware:** ESP32-S3-WROOM-1 (~₹400) + ELM327 OBD-II (~₹350)
 - **Firmware:** Complete C++ implementation with OBD-II polling, TFLite Micro inference, BLE communication, and XAI alert generation
 - **BOM Cost:** ₹1,385 per dongle (~$17 USD)
+
+### Phase 5: QAT & Full INT8 Quantization
+- **Quantization-Aware Training (QAT):** Resolved BatchNorm rounding errors by simulating INT8 quantization during training.
+- **Edge Model Size:** Compressed from 22.6 KB to **16.72 KB** (INT8) (26% size reduction, under 20 KB limit).
+- **Edge Model Metrics:** **98.84% accuracy**, **99.42% recall**, **98.33% precision** (retains 100% cloud model accuracy!).
+- **ESP32 benefit:** Uses `tf.float32` boundary I/O for compatibility with INT8 internal math, leveraging ESP32-S3 LX7 vector operations.
+- **Status:** All software, firmware, and model compilation completed. The only work left is the physical hardware connection.
 
 ---
 
@@ -144,6 +152,9 @@ python xai_analysis.py
 
 # Phase 4: Train edge model + convert to TFLite
 python phase4_realistic.py
+
+# Phase 5: Train QAT model + convert to INT8 TFLite + validate
+python phase5_qat_int8.py
 ```
 
 ### Flash ESP32 Firmware
@@ -194,13 +205,14 @@ pio run --target upload
 | Accuracy | 98.15% | **98.84%** | +0.69% |
 | Privacy | None | **DP (ε=1.0)** | ✅ Added |
 | Explainability | None | **SHAP + LIME + Alerts** | ✅ Added |
-| Edge Deployment | None | **22.6 KB TFLite** | ✅ Added |
+| Edge Deployment | None | **16.72 KB INT8 TFLite** | ✅ Added (ESP32-S3 optimized) |
 | Cost per Unit | N/A | **₹1,385** | ✅ Practical |
 
 ---
 
 ## 🔮 Future Work
 
+- [ ] Connect ESP32-S3 and ELM327 modules to OBD-II connector (physical wiring/connection)
 - [ ] Collect real OBD-II data from Indian vehicles for validation
 - [ ] Enhace Web Dashboard with cloud sync
 - [ ] Add over-the-air (OTA) model updates via WiFi

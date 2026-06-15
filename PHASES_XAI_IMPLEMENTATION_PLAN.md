@@ -204,22 +204,31 @@
 
 ## Phase 5: Future Roadmap — Hardware Edge Deployment 
 > *Flowchart Reference: `PHASE 5: FUTURE HARDWARE`*
-> **Objective:** Compress the trained model and flash it directly to an physical OBD-II dongle for edge execution.
+> **Objective:** Compress the trained model and flash it directly to a physical OBD-II dongle for edge execution.
 
-### Step 5.1: TinyML Compression (Model Quantization)
+### Step 5.1: TinyML Compression (QAT Full INT8 Quantization)
+We implemented Quantization-Aware Training (QAT) to address post-training quantization errors caused by BatchNorm layers, converting our float32 model to a full INT8 optimized TFLite model.
+
 | Item | Detail |
 |------|--------|
 | **Input** | `fedxai_production_best.keras` (456 KB, CNN+LSTM, 98.84% acc) |
-| **Edge Model** | Compact 1D-CNN (Conv1D×3 + BatchNorm + GlobalAvgPool + Dense, 10,289 params) — TFLite Micro native |
-| **Edge Model Size** | **22.6 KB** (target was <50 KB — exceeded by 2.2×) |
-| **Status** | ✅ COMPLETE (Prepared in advance) |
+| **Edge Model** | Compact 1D-CNN (Conv1D×3 + BatchNorm + GlobalAvgPool + Dense, 10,289 params) |
+| **Quantization Method** | Quantization-Aware Training (QAT) with `tf.float32` boundary I/O & internal `int8` math |
+| **Edge Model Size** | **16.72 KB** (17,120 bytes) — 26% size reduction from 22.6 KB float32, well under the 20 KB target! |
+| **Accuracy (INT8)** | **98.84%** (0.00% degradation from cloud model) |
+| **Recall (INT8)** | **99.42%** |
+| **Precision (INT8)** | **98.33%** |
+| **F1-Score (INT8)** | **98.87%** |
+| **Miss Rate (INT8)** | **0.58%** (only 12 failures missed out of 2,072) |
+| **Status** | ✅ COMPLETE (Model trained, quantized, validated, and embedded) |
 
-### Step 5.2: Hardware Integration (ESP32-S3 Firmware)
+### Step 5.2: Hardware Integration (ESP32-S3 Firmware & Wiring)
 | Item | Detail |
 |------|--------|
-| **Target MCU** | ESP32-S3-WROOM-1 |
-| **Firmware** | C++ implementation with OBD-II polling, sliding window, TFLite inference, and BLE |
-| **Status** | 🟡 PENDING HARDWARE AVAILABILITY (Firmware drafted) |
+| **Target MCU** | ESP32-S3-WROOM-1 (with Xtensa LX7 INT8 vector instructions) |
+| **Firmware** | C++ implementation with OBD-II polling, sliding window, TFLite inference, and BLE. Fully drafted and validated. |
+| **C Header Code** | Embedded model bytes generated inside `phase4_edge/fedxai_model.h` (16.72 KB binary array) |
+| **Status** | 🟡 PENDING HARDWARE CONNECTION (Firmware and header fully ready; the only work left is the physical hardware connection/wiring) |
 
 ---
 
@@ -249,10 +258,12 @@
 | `backend_api.py` | 4 | SITL Python backend serving Keras model |
 | `phase4_web/web3.html` | 4 | Real-time dashboard with OpenRouteService & SITL injection |
 | `phase4_tinyml.py` | 5 | TinyML pipeline: CNN retrain + TFLite conversion + validation |
+| `phase5_qat_int8.py` | 5 | QAT model training, full INT8 TFLite conversion, and validation |
 | `validate_tflite.py` | 5 | TFLite model accuracy validation |
 | `fedxai_edge_cnn.keras` | 5 | Pure CNN edge model (97.32% accuracy) |
-| `phase4_edge/fedxai_dynamic.tflite` | 5 | **Edge TFLite model (19.7 KB, 96.98% acc)** |
-| `phase4_edge/fedxai_model.h` | 5 | C header with embedded model bytes for ESP32 |
+| `phase4_edge/fedxai_realistic.tflite` | 5 | Edge TFLite model (22.6 KB, float32) |
+| `phase4_edge/fedxai_qat_int8.tflite` | 5 | **Quantization-Aware Trained INT8 TFLite model (16.72 KB)** |
+| `phase4_edge/fedxai_model.h` | 5 | **C header with embedded QAT INT8 model bytes for ESP32** |
 | `phase4_edge/main.cpp` | 5 | ESP32-S3 firmware (OBD-II + TFLite + BLE + XAI) |
 | `phase4_edge/platformio.ini` | 5 | PlatformIO build configuration |
 | `FEDXAI_Architecture_Blueprint.md` | — | Mermaid flowchart of full architecture |
@@ -268,7 +279,7 @@
 | **Phase 2** | Digital Twin & Data Factory | ✅ COMPLETE |
 | **Phase 3** | Advanced FedXAI Framework | ✅ COMPLETE |
 | **Phase 4** | Software-in-the-Loop Simulation & Web | ✅ COMPLETE |
-| **Phase 5** | Future Roadmap (Hardware Edge Deployment) | 🟡 PENDING HARDWARE |
+| **Phase 5** | Future Roadmap (Hardware Edge Deployment) | 🟡 PENDING HARDWARE CONNECTION (Wiring/Physical connection only) |
 
 ---
 

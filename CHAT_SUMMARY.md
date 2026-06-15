@@ -1,9 +1,9 @@
 # Session Summary: FEDXAI-AUTO
-**Last Updated:** March 7, 2026
+**Last Updated:** June 16, 2026
 
 ## 1. Project Context
 **Project:** FEDXAI-AUTO (Federated Learning & XAI for Automotive Predictive Maintenance)
-**Focus:** Phase 4 (Edge AI), XAI Integration (SHAP + LIME), and Presentation Refinement.
+**Focus:** Phase 4 (Edge AI), Phase 5 (QAT & Full INT8 Quantization), XAI Integration (SHAP + LIME), and ESP32-S3 Firmware Deployment.
 
 ---
 
@@ -34,10 +34,23 @@
     *   `lime_feature_importance.png` — Aggregated LIME bar chart ranking all 8 features
 *   **Cross-validation:** Both SHAP and LIME agree on top 3 features: Fuel Trim Long-Term, Engine RPM, Fuel Pressure.
 
-### Part 4: Documentation Updates
-*   **README.md:** Updated XAI description (SHAP+LIME), repo structure (5 XAI files), prerequisites (`lime`), comparison table.
-*   **PHASES_XAI_IMPLEMENTATION_PLAN.md:** Updated Step 3.5, file index, technology stack to reflect SHAP+LIME dual-method.
-*   **Cleanup:** Deleted obsolete plan files: `PHASE4_TUNING_PLAN.md`, `PROBLEM_LAYOUT_PLAN.md`, `PHASE4_FULL_RUN_PLAN.md`, `PHASE4_EXACT_ACCURACY_PLAN.md`.
+### Part 4: Quantization-Aware Training & Full INT8 Quantization (Phase 5)
+*   **Identified Bottleneck:** Standard Post-Training Quantization (PTQ) to INT8 failed (accuracy dropped to ~51%) because BatchNormalization layers introduced catastrophic rounding errors.
+*   **Implemented QAT Pipeline (`phase5_qat_int8.py`):**
+    *   Used `tensorflow-model-optimization` (`tfmot`) to inject fake quantization nodes during model fine-tuning.
+    *   This taught the model to compensate for 8-bit rounding noise. During export, BatchNorm layers were automatically folded into Conv1D layers.
+    *   Optimized with `float32` boundary I/O for direct integration compatibility, while internal weight/activation operations run on native `int8` (leveraging ESP32-S3 LX7 vector operations).
+*   **Key Results:**
+    *   **Model Size:** Reduced from 22.6 KB (float32) to **16.72 KB** (INT8), a 26% saving and well below the 20 KB target.
+    *   **Edge Accuracy:** **98.84%** (0% drop compared to the cloud model!).
+    *   **Recall:** **99.42%** | **Precision:** **98.33%** | **Miss Rate:** **0.58%** (only 12 failures missed out of 2,072).
+*   **ESP32 Integration (`fedxai_model.h`):** Successfully regenerated the C header array containing the QAT INT8 binary bytes, ready for PlatformIO flashing.
+*   **Status:** All software, model training, quantization, and firmware configurations are 100% complete. **The only work left is the physical hardware connection/wiring.**
+
+### Part 5: Documentation & Cleanup
+*   **README.md:** Updated Key Results, repo structure, Methodology, Setup instructions, and Comparison table to reflect Phase 5 QAT INT8.
+*   **PHASES_XAI_IMPLEMENTATION_PLAN.md:** Updated Step 5.1 (QAT INT8 metrics), Step 5.2 (Hardware Integration status), file index, and Progress Tracker.
+*   **Cleanup:** Deleted temporary headers/scripts and the failed PTQ file (`phase4_edge/fedxai_realistic_int8.tflite`).
 
 ---
 
@@ -46,17 +59,17 @@
 |--------|:---:|:---:|
 | **Model** | Gradient Boosting (sklearn) | CNN (TensorFlow) |
 | **Training** | Federated Learning | Centralized + FL Fine-Tuning |
-| **Accuracy** | 98.15% | **98.84%** (cloud) / **98.61%** (edge) |
+| **Accuracy** | 98.15% | **98.84%** (cloud) / **98.84%** (edge QAT INT8) / **98.61%** (edge Float32) |
 | **XAI** | SHAP + LIME | **SHAP + LIME** |
-| **Edge Deployment** | None | **22.6 KB TFLite on ESP32** |
+| **Edge Deployment** | None | **16.72 KB INT8 TFLite on ESP32-S3** |
 | **Privacy** | Federated | **DP (epsilon=1.0) + SecAgg** |
 
 ---
 
 ## 4. Technology Stack
-`tensorflow`, `numpy`, `pandas`, `sklearn`, `shap`, `lime`, `matplotlib`
+`tensorflow`, `tensorflow-model-optimization`, `numpy`, `pandas`, `sklearn`, `shap`, `lime`, `matplotlib`
 
 ## 5. Environment
 *   **Local Path:** `c:\Users\kvars\OneDrive\Documents\FEDXAI-AUTO`
-*   **Python:** 3.13
+*   **Python:** 3.13 (or 3.10+ legacy for tfmot)
 *   **Git Repo:** `https://github.com/khwaish-20/FEDXAI-AUTO`
