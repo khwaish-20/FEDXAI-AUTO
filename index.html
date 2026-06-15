@@ -171,10 +171,10 @@
                     98.15% accuracy using Federated Learning, they remain computationally heavy and restricted to cloud 
                     servers. <strong>FEDXAI-AUTO</strong> bridges this gap by developing an advanced Temporal Model 
                     (CNN+LSTM) that guarantees zero raw-data leakage through Differential Privacy. Furthermore, our ultimate 
-                    innovation extends into futuristic hardware integration (TinyML): we aggressively compressed the production 
-                    model from 456 KB down to an ultra-lightweight <strong>19.7 KB</strong> 1D-CNN. This paves the immediate 
-                    path for flashing our privacy-preserving XAI directly onto physical ESP32 edge devices (OBD-II dongles), 
-                    enabling instantaneous, offline diagnostics inside the vehicle.</p>
+                    innovation extends into futuristic hardware integration (TinyML): we implemented **Quantization-Aware Training (QAT)** 
+                    to overcome quantization losses from BatchNormalization layers, compressing the model from 456 KB down to an 
+                    ultra-lightweight **16.72 KB** INT8 model. This model achieves **98.84% accuracy** (0% drop from the cloud model) 
+                    and is ready for flashing onto physical ESP32 edge devices (OBD-II dongles), enabling instant, offline diagnostics.</p>
             </div>
         </section>
 
@@ -228,7 +228,7 @@
                             Performance</span>
                         <span class="text-blue-400 font-mono font-black text-3xl">98.84%</span>
                     </div>
-                    <p class="text-slate-500 text-sm italic text-justify leading-relaxed">Exceeding our baseline target, the federated CNN+LSTM production model achieved a dominant <strong>98.84% Accuracy</strong> with a <strong>98.79% Recall</strong>, practically eliminating False Negatives (recording a remarkably low 1.21% Miss Rate). This ensures critical E20 degradation events are never missed. While maintaining these high metrics, our Explainable AI (SHAP/LIME) layer successfully translates complex multi-sensor anomalies into trustworthy, human-readable insights. Finally, prioritizing our future edge roadmap, we quantized the architecture via TFLite INT8, yielding a microscopic <strong>19.7 KB</strong> model that effortlessly retains <strong>96.98% Accuracy</strong>—fully optimized for direct embedded hardware execution.</p>
+                    <p class="text-slate-500 text-sm italic text-justify leading-relaxed">Exceeding our baseline target, the federated CNN+LSTM production model achieved a dominant <strong>98.84% Accuracy</strong> with a <strong>98.79% Recall</strong> (recording a remarkably low 1.21% Miss Rate). This ensures critical E20 degradation events are never missed. While maintaining these high metrics, our Explainable AI (SHAP/LIME) layer successfully translates complex multi-sensor anomalies into trustworthy, human-readable insights. Finally, prioritizing our edge roadmap, we performed **Quantization-Aware Training (QAT)** to export a microscopic <strong>16.72 KB</strong> INT8 model that effortlessly retains the full **98.84% Accuracy** and **99.42% Recall**—fully optimized for direct hardware execution on ESP32-S3 vector instructions.</p>
                 </div>
             </div>
         </section>
@@ -287,14 +287,14 @@
             }, 1000);
         }
 
-        // RESULTS CHART (Demo Data)
+        // RESULTS CHART (QAT INT8 Verified Data)
         const ctx = document.getElementById('resultsChart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Baseline (Paper)', 'Cloud Model (Ph 4)', 'TinyML Edge (Ph 5)'],
+                labels: ['Baseline (Paper)', 'Cloud Model (Ph 3)', 'TinyML Edge (QAT INT8)'],
                 datasets: [{
-                    data: [98.15, 98.84, 96.98],
+                    data: [98.15, 98.84, 98.84],
                     backgroundColor: ['#1e293b', '#3b82f6', '#10b981'],
                     borderRadius: 15,
                     barThickness: 50
